@@ -1,0 +1,3 @@
+Flask==2.1.2
+pymongo==4.1.1
+pymongo-migrate==0.11.0
