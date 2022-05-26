@@ -7,4 +7,5 @@ Web framework for end to end machine learning
 3. NodeJs: v16.15.0 (npm: 8.5.5)
 4. Docker
 
-
+# To bring up Mongodb
+`docker-compose up -d`
