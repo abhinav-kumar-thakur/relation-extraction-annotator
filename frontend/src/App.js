@@ -23,7 +23,9 @@ function App() {
     const indexToRemove = e.target.getAttribute("pos");
     const entityToRemove = entities[indexToRemove];
     const newEntities = entities.filter((entity, index) => entity !== entityToRemove);
+    const newRelations = relations.filter((relation, index) => relation.from !== entityToRemove.text && relation.to !== entityToRemove.text);
     setEntities(newEntities);
+    setRelations(newRelations);
   };
 
   const handleRemoveRelation = (e) => {
