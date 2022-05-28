@@ -39,7 +39,7 @@ function App() {
     const indexToRemove = e.target.getAttribute("pos");
     const entityToRemove = entities[indexToRemove];
     const newEntities = entities.filter((entity, index) => entity !== entityToRemove);
-    const newRelations = relations.filter((relation, index) => relation.from !== entityToRemove.text && relation.to !== entityToRemove.text);
+    const newRelations = relations.filter((relation, index) => relation.head.text !== entityToRemove.text && relation.tail.text !== entityToRemove.text);
     setEntities(newEntities);
     setRelations(newRelations);
   };
@@ -138,6 +138,7 @@ function App() {
           <button onClick={getTypesHandler}>Get types</button>
         </span>
       </div>
+      <p> {textData.map((token, index) => `(${index}:${token})`).join('\t')} </p>
       <textarea className='Sentence' value={textData.join(' ')} onSelect={(event) => {
         const start = event.target.selectionStart;
         const end = event.target.selectionEnd;
@@ -150,28 +151,41 @@ function App() {
         <select name="Entity Types" id="entitytypes" onChange={(e) => { setSelectedEntityType(e.target.value) }}>
           {entityTypes.map((entityType, index) => <option value={entityType}>{entityType}</option>)}
         </select>
-        <button disabled={!selectedText} onClick={() => { setEntities(entities.concat({ text: selectedText, type: selectedEntityType })) }}>
+        <p>Text: {selectedText}</p>
+        <p>Start: {textData.indexOf(selectedText.split(' ')[0])}</p>
+        <p>End: {textData.indexOf(selectedText.split(' ')[selectedText.split(' ').length - 1]) + 1}</p>
+        <button disabled={!selectedText} onClick={() => {
+          const selected_tokens = selectedText.split(' ');
+          const entity_start = textData.indexOf(selected_tokens[0]);
+          const entity_end = textData.indexOf(selected_tokens[selected_tokens.length - 1]) + 1;
+          const new_entities = entities.concat({ text: selectedText, type: selectedEntityType, start: entity_start, end: entity_end });
+          new_entities.sort((a, b) => a.start - b.start);
+          setEntities(new_entities);
+        }}>
           Add Entity
         </button>
-        <p>Start: {selectedTextStart}</p>
-        <p>End: {selectedTextEnd}</p>
-        <p>Text: {selectedText}</p>
       </div>
 
       <div className='ActionPanel'>
-        <span> From Entity: <select name="Relation Types" id="entitytypes" onChange={(e) => { setSelectedFromEntity(e.target.value) }}>
+        <span> From Entity: <select name="Relation Types" id="entitytypes" onChange={(e) => { 
+          const selected_entity = entities.filter((entity) => entity.text === e.target.value)[0];
+          setSelectedFromEntity(selected_entity) 
+        }}>
           <option value="None">None</option>
           {entities.map((entity, index) => <option value={entity.text}> {entity.text} </option>)}
         </select></span>
         <span> Relation Type: <select name="Relation Types" id="entitytypes" onChange={(e) => { setSelectedRelationType(e.target.value) }}>
           {relationTypes.map((relationType, index) => <option value={relationType}> {relationType} </option>)}
         </select></span>
-        <span> To Entity: <select name="Relation Types" id="entitytypes" onChange={(e) => { setSelectedToEntity(e.target.value) }}>
+        <span> To Entity: <select name="Relation Types" id="entitytypes" onChange={(e) => {
+          const selected_entity = entities.filter((entity) => entity.text === e.target.value)[0];
+          setSelectedToEntity(selected_entity)
+        }}>
           <option value="None">None</option>
           {entities.map((entity, index) => <option value={entity.text}> {entity.text} </option>)}
         </select></span>
         <button disabled={selectedFromEntity === "None" && selectedToEntity === "None"} onClick={() => {
-          setRelations(relations.concat({ from: selectedFromEntity, type: selectedRelationType, to: selectedToEntity }));
+          setRelations(relations.concat({ head: selectedFromEntity, type: selectedRelationType, tail: selectedToEntity}));
         }}>
           Add Relation
         </button>
