@@ -3,8 +3,13 @@ import './App.css';
 import React, { useState } from 'react';
 
 function App() {
-  const entityTypes = ['PERSON', 'LOCATION', 'ORGANIZATION', 'MISC'];
-  const relationTypes = ['Employee', 'Other']
+  // NER types
+  const [entityTypes, setEntityTypes] = useState(['Upload Types File']);
+  const [relationTypes, setRelationTypes] = useState(['Upload Types File']);
+
+  // NER Types states
+  const [selectedEntityTypesFile, setSelectedEntityTypesFile] = useState();
+  const [isEntityTypesFileSelected, setIsEntityTypesFileSelected] = useState(false);
 
   // Text selection states
   const [selectedText, setSelectedText] = useState('Initial value');
@@ -19,6 +24,7 @@ function App() {
   const [selectedFromEntity, setSelectedFromEntity] = useState('None');
   const [selectedToEntity, setSelectedToEntity] = useState('None');
 
+  // Handlers
   const handleRemoveEntity = (e) => {
     const indexToRemove = e.target.getAttribute("pos");
     const entityToRemove = entities[indexToRemove];
@@ -35,8 +41,38 @@ function App() {
     setRelations(newRelations);
   };
 
+  const entityTypesFileChangeHandler = (event) => {
+    setSelectedEntityTypesFile(event.target.files[0]);
+    setIsEntityTypesFileSelected(true);
+  };
+
+  const handleSubmission = () => {
+    const formData = new FormData();
+    formData.append('File', selectedEntityTypesFile);
+    fetch('http://127.0.0.1:5000/ner/types/upload', { method: 'POST', body: formData })
+      .then((response) => response.json())
+      .then((result) => { console.log('Success:', result) })
+      .then(
+        fetch('http://127.0.0.1:5000/ner/types', { method: 'GET' })
+          .then((response) => response.json())
+          .then((result) => {
+            setEntityTypes(result['entities']);
+            setRelationTypes(result['relations'])
+          })
+      )
+      .catch((error) => { console.error('Error:', error) });
+  };
+
+  // NER labelling UI
   return (
     <div>
+      <div className="NER_types_inputs">
+        <span>
+          <label>Types file: </label>
+          <input type="file" onChange={entityTypesFileChangeHandler} />
+          <button onClick={handleSubmission} disabled={!isEntityTypesFileSelected} >Upload</button>
+        </span>
+      </div>
       <textarea className='Sentence' onSelect={(event) => {
         const start = event.target.selectionStart;
         const end = event.target.selectionEnd;
@@ -48,10 +84,11 @@ function App() {
       </textarea>
 
       <div className='ActionPanel'>
+        <p> Entity Types: </p>
         <select name="Entity Types" id="entitytypes" onChange={(e) => { setSelectedEntityType(e.target.value) }}>
           {entityTypes.map((entityType, index) => <option value={entityType}>{entityType}</option>)}
         </select>
-        <button onClick={() => { setEntities(entities.concat({ text: selectedText, type: selectedEntityType })) }}>
+        <button disabled={!selectedText} onClick={() => { setEntities(entities.concat({ text: selectedText, type: selectedEntityType })) }}>
           Add Entity
         </button>
         <p>Start: {selectedTextStart}</p>
@@ -71,7 +108,7 @@ function App() {
           <option value="None">None</option>
           {entities.map((entity, index) => <option value={entity.text}> {entity.text} </option>)}
         </select></span>
-        <button onClick={() => {
+        <button disabled={selectedFromEntity === "None" && selectedToEntity === "None"} onClick={() => {
           setRelations(relations.concat({ from: selectedFromEntity, type: selectedRelationType, to: selectedToEntity }));
         }}>
           Add Relation

@@ -2,6 +2,16 @@
   text-align: center;
 }
 
+.NER_types_inputs {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  width: 90%;
+}
+
 .Sentence {
   font-size: 1em;
   font-weight: lighter;
