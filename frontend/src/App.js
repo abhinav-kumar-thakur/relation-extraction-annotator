@@ -3,21 +3,31 @@ import './App.css';
 import React, { useState } from 'react';
 
 function App() {
+
+  // NER Types file states
+  const [selectedEntityTypesFile, setSelectedEntityTypesFile] = useState();
+  const [isEntityTypesFileSelected, setIsEntityTypesFileSelected] = useState(false);
+
+  // data file states
+  const [selectedDataFile, setSelectedDataFile] = useState();
+  const [isDataFileSelected, setIsDataFileSelected] = useState(false);
+
   // NER types
   const [entityTypes, setEntityTypes] = useState(['Upload Types File']);
   const [relationTypes, setRelationTypes] = useState(['Upload Types File']);
 
-  // NER Types states
-  const [selectedEntityTypesFile, setSelectedEntityTypesFile] = useState();
-  const [isEntityTypesFileSelected, setIsEntityTypesFileSelected] = useState(false);
+  // Text data
+  const [textData, setTextData] = useState([]);
 
   // Text selection states
-  const [selectedText, setSelectedText] = useState('Initial value');
+  const [selectedText, setSelectedText] = useState('');
   const [selectedTextStart, setSelectedTextStart] = useState(-1);
   const [selectedTextEnd, setSelectedTextEnd] = useState(-1);
+  
   // Create Entity states
   const [entities, setEntities] = useState([]);
   const [selectedEntityType, setSelectedEntityType] = useState(entityTypes[0]);
+  
   // Create Relation states
   const [relations, setRelations] = useState([]);
   const [selectedRelationType, setSelectedRelationType] = useState(relationTypes[0]);
@@ -46,21 +56,65 @@ function App() {
     setIsEntityTypesFileSelected(true);
   };
 
-  const handleSubmission = () => {
+  const handleNERFileSubmission = () => {
     const formData = new FormData();
     formData.append('File', selectedEntityTypesFile);
     fetch('http://127.0.0.1:5000/ner/types/upload', { method: 'POST', body: formData })
       .then((response) => response.json())
       .then((result) => { console.log('Success:', result) })
-      .then(
-        fetch('http://127.0.0.1:5000/ner/types', { method: 'GET' })
+      .catch((error) => { console.error('Error:', error) });
+  };
+
+  const handleDataFileSubmission = () => {
+    const formData = new FormData();
+    formData.append('File', selectedDataFile);
+    fetch('http://127.0.0.1:5000/ner/raw/upload', { method: 'POST', body: formData })
+      .then((response) => response.json())
+      .then((result) => { console.log('Success:', result) })
+      .catch((error) => { console.error('Error:', error) });
+  };
+
+  const dataFileChangeHandler = (event) => {
+    setSelectedDataFile(event.target.files[0]);
+    setIsDataFileSelected(true);
+  };
+
+  const getTypesHandler = () => {
+    fetch('http://127.0.0.1:5000/ner/types', { method: 'GET' })
           .then((response) => response.json())
           .then((result) => {
             setEntityTypes(result['entities']);
             setRelationTypes(result['relations'])
           })
-      )
-      .catch((error) => { console.error('Error:', error) });
+          .catch((error) => { console.error('Error:', error) });
+  };
+
+  const getNextHandler = () => {
+    fetch('http://127.0.0.1:5000/ner/raw/next', { method: 'GET' })
+      .then((response) => response.json())
+      .then((result) => {
+        const r_tokens = result['tokens'];
+        const r_entities = result['entities'].map((entity) => {
+          return {
+            text: r_tokens.slice(entity['start'], entity['end']).join(' '),
+            type: entity['type'],
+            start: entity['start'],
+            end: entity['end']
+          }
+        });
+        
+        const r_relations = result['relations'].map((relation) => {
+          return {
+            'head': r_entities[relation['head']],
+            'tail': r_entities[relation['tail']],
+            'type': relation['type']
+          }
+        });
+
+        setTextData(r_tokens);
+        setEntities(r_entities);
+        setRelations(r_relations);
+      })
   };
 
   // NER labelling UI
@@ -70,19 +124,27 @@ function App() {
         <span>
           <label>Types file: </label>
           <input type="file" onChange={entityTypesFileChangeHandler} />
-          <button onClick={handleSubmission} disabled={!isEntityTypesFileSelected} >Upload</button>
+          <button onClick={handleNERFileSubmission} disabled={!isEntityTypesFileSelected} >Upload</button>
+        </span>
+        <span>
+          <label>Data file: </label>
+          <input type="file" onChange={dataFileChangeHandler} />
+          <button onClick={handleDataFileSubmission} disabled={!isDataFileSelected} >Upload</button>
         </span>
       </div>
-      <textarea className='Sentence' onSelect={(event) => {
+      <div className="Controls">
+        <span>
+          <button onClick={getNextHandler}>Get next</button>
+          <button onClick={getTypesHandler}>Get types</button>
+        </span>
+      </div>
+      <textarea className='Sentence' value={textData.join(' ')} onSelect={(event) => {
         const start = event.target.selectionStart;
         const end = event.target.selectionEnd;
         setSelectedTextStart(start);
         setSelectedTextEnd(end);
         setSelectedText(event.target.value.substring(start, end));
-      }}>
-        Elon Musk is a co-founder and CEO of SpaceX and Tesla Motors. He is also owner of Twitter, Inc.
-      </textarea>
-
+      }} />
       <div className='ActionPanel'>
         <p> Entity Types: </p>
         <select name="Entity Types" id="entitytypes" onChange={(e) => { setSelectedEntityType(e.target.value) }}>
@@ -118,13 +180,13 @@ function App() {
         <div className='Label'>
           <p>Entities</p>
           <ul>
-            {entities.map((entity, index) => <li pos={index} onClick={handleRemoveEntity}> {entity.text}:.:{entity.type}</li>)}
+            {entities.map((entity, index) => <li pos={index} onClick={handleRemoveEntity}> {entity.text} {"->"} {entity.type}</li>)}
           </ul>
         </div>
         <div className='Label'>
           <p>Relations</p>
           <ul>
-            {relations.map((relation, index) => <li pos={index} onClick={handleRemoveRelation}> {relation.from}:.:{relation.type}:.:{relation.to}</li>)}
+            {relations.map((relation, index) => <li pos={index} onClick={handleRemoveRelation}> {relation.head.text} {"->"} {relation.type} {"->"} {relation.tail.text}</li>)}
           </ul>
         </div>
       </div>

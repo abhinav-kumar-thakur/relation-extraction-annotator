@@ -1,7 +1,5 @@
 from typing import Dict
 
-from werkzeug.local import LocalProxy
-
 from db.db import db
 
 
@@ -16,3 +14,25 @@ def get_ner_types():
     entities = list(types['entities'].keys())
     relations = list(types['relations'].keys())
     return {'entities': entities, 'relations': relations}
+
+# Upload raw data to db
+def upload_raw_data(raw_data: Dict):
+    for data in raw_data:
+        data['status'] = 'pending'
+    
+    db.raw_data.delete_many({})
+    db.raw_data.insert_many(raw_data)
+
+# Get next raw data from db
+def get_next_raw_data():
+    """
+    Returns the next raw data from the database.
+    """
+
+    next = db.raw_data.find_one_and_update(
+        {'status': 'pending'},
+        {'$set': {'status': 'processing'}}
+    )
+    
+    next['_id'] = str(next['_id'])
+    return next
