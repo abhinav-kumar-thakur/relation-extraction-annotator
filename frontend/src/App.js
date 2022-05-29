@@ -147,7 +147,6 @@ function App() {
       .catch((error) => { console.error('Error:', error) });
   };
 
-
   // NER labelling UI
   return (
     <div>
@@ -170,6 +169,7 @@ function App() {
           <button onClick={approveHandler}>Approve</button>
         </span>
       </div>
+      <a href='http://127.0.0.1:5000/ner/approved/download'>Download approved</a>
       <p> {textData.map((token, index) => `(${index}:${token})`).join('\t')} </p>
       <textarea className='Sentence' value={textData.join(' ')} onSelect={(event) => {
         const start = event.target.selectionStart;

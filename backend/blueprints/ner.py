@@ -1,12 +1,12 @@
 from email.policy import default
 import json
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, Response, request, jsonify
 
 from db.ner import upload_ner_types, get_ner_types
 from db.ner import upload_raw_data as upload_raw_data_db
 from db.ner import get_next_raw_data as get_next_raw_data_db
-from db.ner import update_raw_data
+from db.ner import update_raw_data, get_all_approved_raw_data
 
 
 ner_bp = Blueprint('ner', __name__)
@@ -73,3 +73,15 @@ def approve():
 
     update_raw_data(_id, updates)
     return jsonify({'status': 'success'})
+
+@ner_bp.route('/approved/download', methods=['GET'])
+def download_approved_data():
+    data = get_all_approved_raw_data()
+    
+    return Response(
+        json.dumps(data),
+        mimetype='application/json',
+        headers={
+            'Content-Disposition': 'attachment;filename=approved_data.json'
+        }
+    )

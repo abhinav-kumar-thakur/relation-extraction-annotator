@@ -45,3 +45,12 @@ def update_raw_data(raw_data_id: str, data: Dict):
         {'_id': ObjectId(raw_data_id)},
         {'$set': data}
     )
+
+# Get all approved raw data
+def get_all_approved_raw_data():
+    raw_data = db.raw_data.find({'status': 'approved'})
+    raw_data = list(raw_data)
+    for data in raw_data:
+        data['_id'] = str(data['_id'])
+
+    return raw_data
