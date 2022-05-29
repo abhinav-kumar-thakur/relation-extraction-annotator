@@ -1,5 +1,7 @@
 from typing import Dict
 
+from bson import ObjectId
+
 from db.db import db
 
 
@@ -36,3 +38,10 @@ def get_next_raw_data():
     
     next['_id'] = str(next['_id'])
     return next
+
+# Update raw data in db
+def update_raw_data(raw_data_id: str, data: Dict):
+    db.raw_data.update_one(
+        {'_id': ObjectId(raw_data_id)},
+        {'$set': data}
+    )

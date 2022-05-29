@@ -18,16 +18,17 @@ function App() {
 
   // Text data
   const [textData, setTextData] = useState([]);
+  const [sampleID, setSampleID] = useState(null);
 
   // Text selection states
   const [selectedText, setSelectedText] = useState('');
-  const [selectedTextStart, setSelectedTextStart] = useState(-1);
-  const [selectedTextEnd, setSelectedTextEnd] = useState(-1);
-  
+  const [selectedTextStart, setSelectedTextStart] = useState(null);
+  const [selectedTextEnd, setSelectedTextEnd] = useState(null);
+
   // Create Entity states
   const [entities, setEntities] = useState([]);
   const [selectedEntityType, setSelectedEntityType] = useState(entityTypes[0]);
-  
+
   // Create Relation states
   const [relations, setRelations] = useState([]);
   const [selectedRelationType, setSelectedRelationType] = useState(relationTypes[0]);
@@ -81,12 +82,13 @@ function App() {
 
   const getTypesHandler = () => {
     fetch('http://127.0.0.1:5000/ner/types', { method: 'GET' })
-          .then((response) => response.json())
-          .then((result) => {
-            setEntityTypes(result['entities']);
-            setRelationTypes(result['relations'])
-          })
-          .catch((error) => { console.error('Error:', error) });
+      .then((response) => response.json())
+      .then((result) => {
+        console.log(result);
+        setEntityTypes(result['entities']);
+        setRelationTypes(result['relations'])
+      })
+      .catch((error) => { console.error('Error:', error) });
   };
 
   const getNextHandler = () => {
@@ -102,7 +104,7 @@ function App() {
             end: entity['end']
           }
         });
-        
+
         const r_relations = result['relations'].map((relation) => {
           return {
             'head': r_entities[relation['head']],
@@ -111,11 +113,40 @@ function App() {
           }
         });
 
+        setSampleID(result['_id']);
         setTextData(r_tokens);
         setEntities(r_entities);
         setRelations(r_relations);
       })
   };
+
+  const approveHandler = () => {
+    const request_relations = relations.map((relation) => {
+      return {
+        'head': entities.findIndex((entity) => entity === relation.head),
+        'tail': entities.findIndex((entity) => entity === relation.tail),
+        'type': relation.type
+      }
+    });
+
+    const body = {
+      '_id': sampleID,
+      'entities': entities,
+      'relations': request_relations
+    };
+
+    fetch('http://127.0.0.1:5000/ner/approve', { 
+      method: 'POST', 
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then((response) => response.json())
+      .then((result) => { console.log('Success:', result) })
+      .catch((error) => { console.error('Error:', error) });
+  };
+
 
   // NER labelling UI
   return (
@@ -136,6 +167,7 @@ function App() {
         <span>
           <button onClick={getNextHandler}>Get next</button>
           <button onClick={getTypesHandler}>Get types</button>
+          <button onClick={approveHandler}>Approve</button>
         </span>
       </div>
       <p> {textData.map((token, index) => `(${index}:${token})`).join('\t')} </p>
@@ -167,9 +199,9 @@ function App() {
       </div>
 
       <div className='ActionPanel'>
-        <span> From Entity: <select name="Relation Types" id="entitytypes" onChange={(e) => { 
+        <span> From Entity: <select name="Relation Types" id="entitytypes" onChange={(e) => {
           const selected_entity = entities.filter((entity) => entity.text === e.target.value)[0];
-          setSelectedFromEntity(selected_entity) 
+          setSelectedFromEntity(selected_entity)
         }}>
           <option value="None">None</option>
           {entities.map((entity, index) => <option value={entity.text}> {entity.text} </option>)}
@@ -185,7 +217,7 @@ function App() {
           {entities.map((entity, index) => <option value={entity.text}> {entity.text} </option>)}
         </select></span>
         <button disabled={selectedFromEntity === "None" && selectedToEntity === "None"} onClick={() => {
-          setRelations(relations.concat({ head: selectedFromEntity, type: selectedRelationType, tail: selectedToEntity}));
+          setRelations(relations.concat({ head: selectedFromEntity, type: selectedRelationType, tail: selectedToEntity }));
         }}>
           Add Relation
         </button>

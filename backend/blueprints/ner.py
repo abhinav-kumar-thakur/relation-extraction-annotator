@@ -6,6 +6,7 @@ from flask import Blueprint, request, jsonify
 from db.ner import upload_ner_types, get_ner_types
 from db.ner import upload_raw_data as upload_raw_data_db
 from db.ner import get_next_raw_data as get_next_raw_data_db
+from db.ner import update_raw_data
 
 
 ner_bp = Blueprint('ner', __name__)
@@ -56,4 +57,19 @@ def get_next_raw_data():
     """
 
     return jsonify(get_next_raw_data_db())
-    
+
+@ner_bp.route('/approve', methods=['POST'])
+def approve():
+    """
+    Approves the raw data.
+    """
+    data = request.get_json()
+    _id = data['_id']
+    updates = {
+        'status': 'approved',
+        'entities': data['entities'],
+        'relations': data['relations']
+    }
+
+    update_raw_data(_id, updates)
+    return jsonify({'status': 'success'})
