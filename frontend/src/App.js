@@ -151,26 +151,20 @@ function App() {
   return (
     <div>
       <div className="NER_types_inputs">
-        <span>
+        <a href='http://127.0.0.1:5000/ner/approved/download' style={{'marginRight': '5%'}}>
+          Download approved data
+        </a>
+        <span style={{'marginRight': '5%', 'border': '2px solid lightblue'}}>
           <label>Types file: </label>
           <input type="file" onChange={entityTypesFileChangeHandler} />
           <button onClick={handleNERFileSubmission} disabled={!isEntityTypesFileSelected} >Upload</button>
         </span>
-        <span>
+        <span style={{'marginRight': '5%', 'border': '2px solid lightblue'}}>
           <label>Data file: </label>
           <input type="file" onChange={dataFileChangeHandler} />
           <button onClick={handleDataFileSubmission} disabled={!isDataFileSelected} >Upload</button>
         </span>
       </div>
-      <div className="Controls">
-        <span>
-          <button onClick={getNextHandler}>Get next</button>
-          <button onClick={getTypesHandler}>Get types</button>
-          <button onClick={approveHandler}>Approve</button>
-        </span>
-      </div>
-      <a href='http://127.0.0.1:5000/ner/approved/download'>Download approved</a>
-      <p> {textData.map((token, index) => `(${index}:${token})`).join('\t')} </p>
       <textarea className='Sentence' value={textData.join(' ')} onSelect={(event) => {
         const start = event.target.selectionStart;
         const end = event.target.selectionEnd;
@@ -178,6 +172,12 @@ function App() {
         setSelectedTextEnd(end);
         setSelectedText(event.target.value.substring(start, end));
       }} />
+      <span style={{'marginLeft': '40%'}}>
+        <button onClick={getNextHandler}>Get next</button>
+        <button onClick={getTypesHandler}>Get types</button>
+        <button onClick={approveHandler}>Approve</button>
+      </span>
+      <hr/>
       <div className='ActionPanel'>
         <p> Entity Types: </p>
         <select name="Entity Types" id="entitytypes" onChange={(e) => { setSelectedEntityType(e.target.value) }}>
@@ -197,7 +197,7 @@ function App() {
           Add Entity
         </button>
       </div>
-
+      <hr/>
       <div className='ActionPanel'>
         <span> From Entity: <select name="Relation Types" id="entitytypes" onChange={(e) => {
           const selected_entity = entities.filter((entity) => entity.text === e.target.value)[0];
@@ -222,10 +222,11 @@ function App() {
           Add Relation
         </button>
       </div>
+      <hr/>
       <div className='LabelsWrapper'>
         <div className='Label'>
           <p>Entities</p>
-          <ul>
+          <ul >
             {entities.map((entity, index) => <li pos={index} onClick={handleRemoveEntity}> {entity.text} {"->"} {entity.type}</li>)}
           </ul>
         </div>
