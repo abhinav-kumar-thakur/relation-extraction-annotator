@@ -6,7 +6,7 @@
 
 # Run migrations
 * Local docker connection string: `mongodb://root:example@localhost:27017/learning_e2e?authSource=admin&readPreference=primary&ssl=false`
-* Run migrations: `pymongo-migrate -u <connection_strainf>`
+* Run migrations: `pymongo-migrate -u <connection_string>`
 
 # Starting development application
 Within backend directory run: `FLASK_DEBUG=1 FLASK_ENV=DEVELOPMENT FLASK_APP=app.py flask run`
