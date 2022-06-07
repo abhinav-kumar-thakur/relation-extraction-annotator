@@ -3,6 +3,8 @@ import './App.css';
 import React, { useState } from 'react';
 
 function App() {
+  const backend_url = process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:5000';
+  console.log(backend_url)
 
   // NER Types file states
   const [selectedEntityTypesFile, setSelectedEntityTypesFile] = useState();
@@ -60,7 +62,7 @@ function App() {
   const handleNERFileSubmission = () => {
     const formData = new FormData();
     formData.append('File', selectedEntityTypesFile);
-    fetch('http://127.0.0.1:5000/ner/types/upload', { method: 'POST', body: formData })
+    fetch(backend_url + '/ner/types/upload', { method: 'POST', body: formData })
       .then((response) => response.json())
       .then((result) => { console.log('Success:', result) })
       .catch((error) => { console.error('Error:', error) });
@@ -69,7 +71,7 @@ function App() {
   const handleDataFileSubmission = () => {
     const formData = new FormData();
     formData.append('File', selectedDataFile);
-    fetch('http://127.0.0.1:5000/ner/raw/upload', { method: 'POST', body: formData })
+    fetch(backend_url + '/ner/raw/upload', { method: 'POST', body: formData })
       .then((response) => response.json())
       .then((result) => { console.log('Success:', result) })
       .catch((error) => { console.error('Error:', error) });
@@ -81,7 +83,7 @@ function App() {
   };
 
   const getTypesHandler = () => {
-    fetch('http://127.0.0.1:5000/ner/types', { method: 'GET' })
+    fetch(backend_url + '/ner/types', { method: 'GET' })
       .then((response) => response.json())
       .then((result) => {
         console.log(result);
@@ -92,7 +94,7 @@ function App() {
   };
 
   const getNextHandler = () => {
-    fetch('http://127.0.0.1:5000/ner/raw/next', { method: 'GET' })
+    fetch(backend_url + '/ner/raw/next', { method: 'GET' })
       .then((response) => response.json())
       .then((result) => {
         const r_tokens = result['tokens'];
@@ -135,7 +137,7 @@ function App() {
       'relations': request_relations
     };
 
-    fetch('http://127.0.0.1:5000/ner/approve', { 
+    fetch(backend_url + '/ner/approve', {
       method: 'POST', 
       body: JSON.stringify(body),
       headers: {
@@ -151,7 +153,7 @@ function App() {
   return (
     <div>
       <div className="NER_types_inputs">
-        <a href='http://127.0.0.1:5000/ner/approved/download' style={{'marginRight': '5%'}}>
+        <a href={backend_url + '/ner/approved/download'} style={{'marginRight': '5%'}}>
           Download approved data
         </a>
         <span style={{'marginRight': '5%', 'border': '2px solid lightblue'}}>
