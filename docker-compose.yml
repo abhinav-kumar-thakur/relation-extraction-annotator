@@ -16,9 +16,21 @@ services:
       - ./backend:/backend
     working_dir: /backend
     environment:
-      - DB_HOST=mongodb://root:example@database:27017/learning_e2e?authSource=admin&readPreference=primary&ssl=false
+      - MONGO_URI=mongodb://root:example@database:27017/learning_e2e?authSource=admin&readPreference=primary&ssl=false
     ports:
       - "11000:11000"
     command: sh run.sh
     depends_on:
       - database
+
+  frontend:
+    container_name: learning_e2e_frontend
+    image: learning_e2e_frontend
+    build:
+      context: ./frontend
+      target: production
+    ports:
+      - "11001:80"
+    depends_on:
+      - backend
+      

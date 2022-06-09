@@ -3,7 +3,7 @@ import './App.css';
 import React, { useState } from 'react';
 
 function App() {
-  const backend_url = process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:5000';
+  const backend_url = 'http://127.0.0.1:11000';
   console.log(backend_url)
 
   // NER Types file states
