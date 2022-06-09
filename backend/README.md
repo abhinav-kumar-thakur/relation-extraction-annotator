@@ -10,10 +10,9 @@
 * Conda deactivate: `conda deactivate`
 * Install Dependencies: `pip install -r requirements.txt`
 
-## Run migrations
-* Local docker connection string: `mongodb://root:example@localhost:27017/learning_e2e?authSource=admin&readPreference=primary&ssl=false`
-### Run migrations: 
-* `pymongo-migrate migrate -u <connection_string>`
+### Run migrations
+* Docker connection string: `mongodb://root:example@localhost:27017/learning_e2e?authSource=admin&readPreference=primary&ssl=false`
+* Migration command: `pymongo-migrate migrate -u <connection_string>`
 * Use: `pymongo-migrate migrate  -u "mongodb://root:example@localhost:27017/learning_e2e?authSource=admin&readPreference=primary&ssl=false"`
 
 ## Starting development application
