@@ -9,3 +9,5 @@ Web framework for end to end machine learning
 * Use containerized mongo db: `docker-compose -f docker-compose.dev.yml up --build -d database`
 * [Setting up backend locally](./backend/README.md)
 * [Setting up frontend locally](./frontend/README.md)
+
+*Don't deploy in production with development credentials added in docker-compose.dev.yml*
