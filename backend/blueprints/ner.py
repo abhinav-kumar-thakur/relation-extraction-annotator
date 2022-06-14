@@ -1,4 +1,5 @@
 from email.policy import default
+import http
 import json
 
 from flask import Blueprint, Response, request, jsonify
@@ -50,23 +51,29 @@ def upload_raw_data():
     return jsonify({'status': 'success'})
 
 
-@ner_bp.route('/raw/next', methods=['GET'])
-def get_next_raw_data():
+@ner_bp.route('/raw/next/<string:state>/<int:offset>', methods=['GET'])
+def get_next_raw_data(state: str, offset: int):
     """
     Returns the next raw data from the database.
     """
 
-    return jsonify(get_next_raw_data_db())
+    data = jsonify(get_next_raw_data_db(state, offset))
 
-@ner_bp.route('/approve', methods=['POST'])
-def approve():
+    if not data:
+        return '', http.HTTPStatus.NO_CONTENT
+
+    return data, http.HTTPStatus.OK 
+
+@ner_bp.route('/state/update/<string:state>', methods=['POST'])
+def update_state(state):
     """
     Approves the raw data.
     """
     data = request.get_json()
     _id = data['_id']
+    print(f'Update state: {state} for {_id}')
     updates = {
-        'status': 'approved',
+        'status': state,
         'entities': data['entities'],
         'relations': data['relations']
     }

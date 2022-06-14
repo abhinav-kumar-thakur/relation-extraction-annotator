@@ -26,16 +26,17 @@ def upload_raw_data(raw_data: Dict):
     db.raw_data.insert_many(raw_data)
 
 # Get next raw data from db
-def get_next_raw_data():
+def get_next_raw_data(state: str, offset: int):
     """
     Returns the next raw data from the database.
     """
 
-    next = db.raw_data.find_one_and_update(
-        {'status': 'pending'},
-        {'$set': {'status': 'processing'}}
-    )
-    
+    data = db.raw_data.find({'status': state}).sort('_id').skip(offset).limit(1);
+    data = list(data)
+    if not data:
+        return None
+
+    next = data[0]
     next['_id'] = str(next['_id'])
     return next
 

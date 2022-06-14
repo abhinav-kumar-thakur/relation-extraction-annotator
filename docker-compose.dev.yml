@@ -35,3 +35,4 @@ services:
       - "11001:80"
     depends_on:
       - learning_e2e_backend
+

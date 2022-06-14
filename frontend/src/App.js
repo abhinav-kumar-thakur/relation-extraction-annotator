@@ -13,6 +13,10 @@ function App() {
   const [selectedDataFile, setSelectedDataFile] = useState();
   const [isDataFileSelected, setIsDataFileSelected] = useState(false);
 
+  // Fetch next
+  const [nextFetchFilter, setNextFetchFilter] = useState('pending');
+  const [nextOffset, setNextOffset] = useState(-1);
+
   // NER types
   const [entityTypes, setEntityTypes] = useState(['Upload Types File']);
   const [relationTypes, setRelationTypes] = useState(['Upload Types File']);
@@ -91,36 +95,53 @@ function App() {
       .catch((error) => { console.error('Error:', error) });
   };
 
-  const getNextHandler = () => {
-    fetch(backend_url + '/raw/next', { method: 'GET' })
-      .then((response) => response.json())
+  const getNextHandler = (offset_update) => {
+    const fetch_offset = nextOffset + offset_update;
+    fetch(backend_url + `/raw/next/${nextFetchFilter}/${fetch_offset}`, { method: 'GET' })
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        }
+        else {
+          return null;
+      }}) 
       .then((result) => {
-        const r_tokens = result['tokens'];
-        const r_entities = result['entities'].map((entity) => {
-          return {
-            text: r_tokens.slice(entity['start'], entity['end']).join(' '),
-            type: entity['type'],
-            start: entity['start'],
-            end: entity['end']
-          }
-        });
+        if (result !== null) {
+          const r_tokens = result['tokens'];
+          const r_entities = result['entities'].map((entity) => {
+            return {
+              text: r_tokens.slice(entity['start'], entity['end']).join(' '),
+              type: entity['type'],
+              start: entity['start'],
+              end: entity['end']
+            }
+          });
 
-        const r_relations = result['relations'].map((relation) => {
-          return {
-            'head': r_entities[relation['head']],
-            'tail': r_entities[relation['tail']],
-            'type': relation['type']
-          }
-        });
+          const r_relations = result['relations'].map((relation) => {
+            return {
+              'head': r_entities[relation['head']],
+              'tail': r_entities[relation['tail']],
+              'type': relation['type']
+            }
+          });
 
-        setSampleID(result['_id']);
-        setTextData(r_tokens);
-        setEntities(r_entities);
-        setRelations(r_relations);
-      })
+          setSampleID(result['_id']);
+          setTextData(r_tokens);
+          setEntities(r_entities);
+          setRelations(r_relations);
+          setNextOffset(fetch_offset);
+        } else {
+          setTextData(['No more data']);
+          setEntities([]);
+          setRelations([]);
+          if (nextOffset > -1) {
+            setNextOffset(fetch_offset);
+          }
+      }})
+      .catch((error) => { console.error('Error:', error) });
   };
 
-  const approveHandler = () => {
+  const changeStateHandler = (state) => {
     const request_relations = relations.map((relation) => {
       return {
         'head': entities.findIndex((entity) => entity === relation.head),
@@ -135,7 +156,7 @@ function App() {
       'relations': request_relations
     };
 
-    fetch(backend_url + '/approve', {
+    fetch(backend_url + `/state/update/${state}`, {
       method: 'POST', 
       body: JSON.stringify(body),
       headers: {
@@ -143,7 +164,12 @@ function App() {
       }
     })
       .then((response) => response.json())
-      .then((result) => { console.log('Success:', result) })
+      .then((result) => { 
+        console.log('Success:', result) ;
+        if (nextFetchFilter !== state) {
+          setNextOffset(nextOffset - 1);
+        }
+      })
       .catch((error) => { console.error('Error:', error) });
   };
 
@@ -172,10 +198,24 @@ function App() {
         setSelectedTextEnd(end);
         setSelectedText(event.target.value.substring(start, end));
       }} />
-      <span style={{'marginLeft': '40%'}}>
-        <button onClick={getNextHandler}>Get next</button>
+      <span style={{'marginLeft': '30%'}}>
+        <select name='Filter' id='filter' onChange={(event) => { 
+          setNextOffset(-1); 
+          setNextFetchFilter(event.target.value);
+          setTextData([]);
+          setEntities([]);
+          setRelations([]);
+          }}>
+          <option value='pending'>Pending</option>
+          <option value='approved'>Approved</option>
+          <option value='flag'>Flag</option>
+        </select>
+        
+        <button onClick={() => getNextHandler(-1)}>Get prev</button>
+        <button onClick={() => getNextHandler(1)}>Get next</button>
         <button onClick={getTypesHandler}>Get types</button>
-        <button onClick={approveHandler}>Approve</button>
+        <button onClick={() => changeStateHandler('approved')}>Approve</button>
+        <button onClick={() => changeStateHandler('flag')}>Flag</button>
       </span>
       <hr/>
       <div className='ActionPanel'>
