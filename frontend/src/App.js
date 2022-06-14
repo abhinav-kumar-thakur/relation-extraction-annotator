@@ -266,8 +266,40 @@ function App() {
       <div className='LabelsWrapper'>
         <div className='Label'>
           <p>Entities</p>
-          <ul >
-            {entities.map((entity, index) => <li pos={index} onClick={handleRemoveEntity}> {entity.text} {"->"} {entity.type}</li>)}
+          <ul>
+            {entities.map((entity, index) => 
+              <li style={{width: '100%'}}>
+                <p>{entity.text}</p>
+                <button pos={index} onClick={handleRemoveEntity}>Delete</button>
+                <select name='Entity Type' id={`${index}_entity_type`} defaultValue={entity.type} onChange={(e) => {
+                  const new_entities = entities.map((entity, i) => {
+                    if (i === index) {
+                      return { text: entity.text, type: e.target.value, start: entity.start, end: entity.end }
+                    }
+                    return entity;
+                  });
+                  new_entities.sort((a, b) => a.start - b.start);
+                  setEntities(new_entities);
+                }}>
+                  {entityTypes.map((entityType, index) => <option value={entityType}>{entityType}</option>)}
+                </select>
+                <button disabled={!selectedText} onClick={() => {
+                    const selected_tokens = selectedText.split(' ');
+                    const entity_start = textData.indexOf(selected_tokens[0]);
+                    const entity_end = textData.indexOf(selected_tokens[selected_tokens.length - 1]) + 1;
+                    const new_entities = entities.map((entity, i) => {
+                      if (i === index) {
+                        return { text: selectedText, type: entity.type, start: entity_start, end: entity_end }
+                      }
+                      return entity;
+                    });
+                    new_entities.sort((a, b) => a.start - b.start);
+                    setEntities(new_entities);
+                  }}>
+                    Update text
+                </button>
+              </li>
+            )}
           </ul>
         </div>
         <div className='Label'>
