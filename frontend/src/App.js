@@ -287,6 +287,7 @@ function App() {
                     const selected_tokens = selectedText.split(' ');
                     const entity_start = textData.indexOf(selected_tokens[0]);
                     const entity_end = textData.indexOf(selected_tokens[selected_tokens.length - 1]) + 1;
+                    const old_entity = entities[index];
                     const new_entities = entities.map((entity, i) => {
                       if (i === index) {
                         return { text: selectedText, type: entity.type, start: entity_start, end: entity_end }
@@ -294,7 +295,31 @@ function App() {
                       return entity;
                     });
                     new_entities.sort((a, b) => a.start - b.start);
+
+                    const new_relations = relations.map((relation, i) => {
+                      let new_head = relation.head;
+                      let new_tail = relation.tail;
+                      let is_updated = false;
+
+                      if (new_head.start === old_entity.start && new_head.end === old_entity.end) {
+                        console.log('head');
+                        new_head = { text: selectedText, type: relation.head.type, start: entity_start, end: entity_end };
+                        is_updated = true;
+                      }
+
+                      if (new_tail.start === old_entity.start && new_tail.end === old_entity.end) {
+                        new_tail = { text: selectedText, type: relation.tail.type, start: entity_start, end: entity_end };
+                        is_updated = true;
+                      }
+
+                      if (is_updated) {
+                        return { head: new_head, type: relation.type, tail: new_tail };
+                      }
+                      return relation
+                    });
+
                     setEntities(new_entities);
+                    setRelations(new_relations);
                   }}>
                     Update text
                 </button>
