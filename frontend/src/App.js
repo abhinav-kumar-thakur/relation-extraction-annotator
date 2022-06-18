@@ -294,7 +294,6 @@ function App() {
                       }
                       return entity;
                     });
-                    new_entities.sort((a, b) => a.start - b.start);
 
                     const new_relations = relations.map((relation, i) => {
                       let new_head = relation.head;
@@ -317,7 +316,8 @@ function App() {
                       }
                       return relation
                     });
-
+                    
+                    new_entities.sort((a, b) => a.start - b.start);
                     setEntities(new_entities);
                     setRelations(new_relations);
                   }}>
@@ -330,7 +330,20 @@ function App() {
         <div className='Label'>
           <p>Relations</p>
           <ul>
-            {relations.map((relation, index) => <li pos={index} onClick={handleRemoveRelation}> {relation.head.text} {"->"} {relation.type} {"->"} {relation.tail.text}</li>)}
+            {relations.map((relation, index) => <li pos={index} onClick={handleRemoveRelation}>
+              {relation.head.text + ' '}
+              <select name='Relation Type' id={`${index}_relation_type`} defaultValue={relation.type} onChange={(e) => {
+                  const new_relations = relations.map((rel, i) => {
+                    if (i === index) {
+                      return { head: relation.head, type: e.target.value, tail: relation.tail }
+                    }
+                    return rel;
+                  });
+                  setRelations(new_relations);
+                }}>
+                {relationTypes.map((relationType, index) => <option value={relationType}>{relationType}</option>)}
+              </select>
+             {' ' + relation.tail.text}</li>)}
           </ul>
         </div>
       </div>
