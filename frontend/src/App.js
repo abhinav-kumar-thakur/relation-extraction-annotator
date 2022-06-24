@@ -113,7 +113,8 @@ function App() {
               text: r_tokens.slice(entity['start'], entity['end']).join(' '),
               type: entity['type'],
               start: entity['start'],
-              end: entity['end']
+              end: entity['end'],
+              score: entity['score'] ? JSON.stringify(entity['score']) : ''
             }
           });
 
@@ -121,7 +122,8 @@ function App() {
             return {
               'head': r_entities[relation['head']],
               'tail': r_entities[relation['tail']],
-              'type': relation['type']
+              'type': relation['type'],
+              'score': relation['score'] ? JSON.stringify(relation['score']) : ''
             }
           });
 
@@ -323,6 +325,7 @@ function App() {
                   }}>
                     Update text
                 </button>
+              <p>{entity.score}</p>
               </li>
             )}
           </ul>
@@ -330,8 +333,10 @@ function App() {
         <div className='Label'>
           <p>Relations</p>
           <ul>
-            {relations.map((relation, index) => <li pos={index} onClick={handleRemoveRelation}>
-              {relation.head.text + ' '}
+            
+            {relations.map((relation, index) => <li pos={index}>
+            <button onClick={handleRemoveRelation}> Delete</button>
+              {' ' + relation.head.text + ' '}
               <select name='Relation Type' id={`${index}_relation_type`} defaultValue={relation.type} onChange={(e) => {
                   const new_relations = relations.map((rel, i) => {
                     if (i === index) {
@@ -343,7 +348,10 @@ function App() {
                 }}>
                 {relationTypes.map((relationType, index) => <option value={relationType}>{relationType}</option>)}
               </select>
-             {' ' + relation.tail.text}</li>)}
+             {' ' + relation.tail.text}
+             <p>{relation.score}</p>
+             </li>)}
+             
           </ul>
         </div>
       </div>
