@@ -178,91 +178,94 @@ function App() {
   // NER labelling UI
   return (
     <div>
-      <div className="NER_types_inputs">
-        <a href={backend_url + '/approved/download'} style={{'marginRight': '5%'}}>
-          Download approved data
-        </a>
-        <span style={{'marginRight': '5%', 'border': '2px solid lightblue'}}>
-          <label>Types file: </label>
-          <input type="file" onChange={entityTypesFileChangeHandler} />
-          <button onClick={handleNERFileSubmission} disabled={!isEntityTypesFileSelected} >Upload</button>
+      <div className='ControlPanel'>
+        <div className="NER_types_inputs">
+          <a href={backend_url + '/approved/download'} style={{'marginRight': '5%'}}>
+            Download approved data
+          </a>
+          <span style={{'marginRight': '5%', 'border': '2px solid lightblue'}}>
+            <label>Types file: </label>
+            <input type="file" onChange={entityTypesFileChangeHandler} />
+            <button onClick={handleNERFileSubmission} disabled={!isEntityTypesFileSelected} >Upload</button>
+          </span>
+          <span style={{'marginRight': '5%', 'border': '2px solid lightblue'}}>
+            <label>Data file: </label>
+            <input type="file" onChange={dataFileChangeHandler} />
+            <button onClick={handleDataFileSubmission} disabled={!isDataFileSelected} >Upload</button>
+          </span>
+        </div>
+        <textarea className='Sentence' value={textData.join(' ')} onSelect={(event) => {
+          const start = event.target.selectionStart;
+          const end = event.target.selectionEnd;
+          setSelectedTextStart(start);
+          setSelectedTextEnd(end);
+          setSelectedText(event.target.value.substring(start, end));
+        }} />
+        <span style={{'marginLeft': '30%'}}>
+          <select name='Filter' id='filter' onChange={(event) => { 
+            setNextOffset(-1); 
+            setNextFetchFilter(event.target.value);
+            setTextData([]);
+            setEntities([]);
+            setRelations([]);
+            }}>
+            <option value='pending'>Pending</option>
+            <option value='approved'>Approved</option>
+            <option value='flag'>Flag</option>
+          </select>
+          
+          <button onClick={() => getNextHandler(-1)}>Get prev</button>
+          <button onClick={() => getNextHandler(1)}>Get next</button>
+          <button onClick={getTypesHandler}>Get types</button>
+          <button onClick={() => changeStateHandler('approved')}>Approve</button>
+          <button onClick={() => changeStateHandler('flag')}>Flag</button>
         </span>
-        <span style={{'marginRight': '5%', 'border': '2px solid lightblue'}}>
-          <label>Data file: </label>
-          <input type="file" onChange={dataFileChangeHandler} />
-          <button onClick={handleDataFileSubmission} disabled={!isDataFileSelected} >Upload</button>
-        </span>
-      </div>
-      <textarea className='Sentence' value={textData.join(' ')} onSelect={(event) => {
-        const start = event.target.selectionStart;
-        const end = event.target.selectionEnd;
-        setSelectedTextStart(start);
-        setSelectedTextEnd(end);
-        setSelectedText(event.target.value.substring(start, end));
-      }} />
-      <span style={{'marginLeft': '30%'}}>
-        <select name='Filter' id='filter' onChange={(event) => { 
-          setNextOffset(-1); 
-          setNextFetchFilter(event.target.value);
-          setTextData([]);
-          setEntities([]);
-          setRelations([]);
+        <hr/>
+        <div className='ActionPanel'>
+          <p> Entity Types: </p>
+          <select name="Entity Types" id="entitytypes" onChange={(e) => { setSelectedEntityType(e.target.value) }}>
+            {entityTypes.map((entityType, index) => <option value={entityType}>{entityType}</option>)}
+          </select>
+          <p>Text: {selectedText}</p>
+          <p>Start: {textData.indexOf(selectedText.split(' ')[0])}</p>
+          <p>End: {textData.indexOf(selectedText.split(' ')[selectedText.split(' ').length - 1]) + 1}</p>
+          <button disabled={!selectedText} onClick={() => {
+            const selected_tokens = selectedText.split(' ');
+            const entity_start = textData.indexOf(selected_tokens[0]);
+            const entity_end = textData.indexOf(selected_tokens[selected_tokens.length - 1]) + 1;
+            const new_entities = entities.concat({ text: selectedText, type: selectedEntityType, start: entity_start, end: entity_end });
+            new_entities.sort((a, b) => a.start - b.start);
+            setEntities(new_entities);
           }}>
-          <option value='pending'>Pending</option>
-          <option value='approved'>Approved</option>
-          <option value='flag'>Flag</option>
-        </select>
+            Add Entity
+          </button>
+        </div>
+        <hr/>
+        <div className='ActionPanel'>
+          <span> From Entity: <select name="Relation Types" id="entitytypes" onChange={(e) => {
+            const selected_entity = entities.filter((entity) => entity.text === e.target.value)[0];
+            setSelectedFromEntity(selected_entity)
+          }}>
+            <option value="None">None</option>
+            {entities.map((entity, index) => <option value={entity.text}> {entity.text} </option>)}
+          </select></span>
+          <span> Relation Type: <select name="Relation Types" id="entitytypes" onChange={(e) => { setSelectedRelationType(e.target.value) }}>
+            {relationTypes.map((relationType, index) => <option value={relationType}> {relationType} </option>)}
+          </select></span>
+          <span> To Entity: <select name="Relation Types" id="entitytypes" onChange={(e) => {
+            const selected_entity = entities.filter((entity) => entity.text === e.target.value)[0];
+            setSelectedToEntity(selected_entity)
+          }}>
+            <option value="None">None</option>
+            {entities.map((entity, index) => <option value={entity.text}> {entity.text} </option>)}
+          </select></span>
+          <button disabled={selectedFromEntity === "None" && selectedToEntity === "None"} onClick={() => {
+            setRelations(relations.concat({ head: selectedFromEntity, type: selectedRelationType, tail: selectedToEntity }));
+          }}>
+            Add Relation
+          </button>
+        </div>
         
-        <button onClick={() => getNextHandler(-1)}>Get prev</button>
-        <button onClick={() => getNextHandler(1)}>Get next</button>
-        <button onClick={getTypesHandler}>Get types</button>
-        <button onClick={() => changeStateHandler('approved')}>Approve</button>
-        <button onClick={() => changeStateHandler('flag')}>Flag</button>
-      </span>
-      <hr/>
-      <div className='ActionPanel'>
-        <p> Entity Types: </p>
-        <select name="Entity Types" id="entitytypes" onChange={(e) => { setSelectedEntityType(e.target.value) }}>
-          {entityTypes.map((entityType, index) => <option value={entityType}>{entityType}</option>)}
-        </select>
-        <p>Text: {selectedText}</p>
-        <p>Start: {textData.indexOf(selectedText.split(' ')[0])}</p>
-        <p>End: {textData.indexOf(selectedText.split(' ')[selectedText.split(' ').length - 1]) + 1}</p>
-        <button disabled={!selectedText} onClick={() => {
-          const selected_tokens = selectedText.split(' ');
-          const entity_start = textData.indexOf(selected_tokens[0]);
-          const entity_end = textData.indexOf(selected_tokens[selected_tokens.length - 1]) + 1;
-          const new_entities = entities.concat({ text: selectedText, type: selectedEntityType, start: entity_start, end: entity_end });
-          new_entities.sort((a, b) => a.start - b.start);
-          setEntities(new_entities);
-        }}>
-          Add Entity
-        </button>
-      </div>
-      <hr/>
-      <div className='ActionPanel'>
-        <span> From Entity: <select name="Relation Types" id="entitytypes" onChange={(e) => {
-          const selected_entity = entities.filter((entity) => entity.text === e.target.value)[0];
-          setSelectedFromEntity(selected_entity)
-        }}>
-          <option value="None">None</option>
-          {entities.map((entity, index) => <option value={entity.text}> {entity.text} </option>)}
-        </select></span>
-        <span> Relation Type: <select name="Relation Types" id="entitytypes" onChange={(e) => { setSelectedRelationType(e.target.value) }}>
-          {relationTypes.map((relationType, index) => <option value={relationType}> {relationType} </option>)}
-        </select></span>
-        <span> To Entity: <select name="Relation Types" id="entitytypes" onChange={(e) => {
-          const selected_entity = entities.filter((entity) => entity.text === e.target.value)[0];
-          setSelectedToEntity(selected_entity)
-        }}>
-          <option value="None">None</option>
-          {entities.map((entity, index) => <option value={entity.text}> {entity.text} </option>)}
-        </select></span>
-        <button disabled={selectedFromEntity === "None" && selectedToEntity === "None"} onClick={() => {
-          setRelations(relations.concat({ head: selectedFromEntity, type: selectedRelationType, tail: selectedToEntity }));
-        }}>
-          Add Relation
-        </button>
       </div>
       <hr/>
       <div className='LabelsWrapper'>
@@ -324,7 +327,8 @@ function App() {
                     setRelations(new_relations);
                   }}>
                     Update text
-                </button> {entity.score}
+                </button>
+                <p>{entity.score}</p>
               </li>
             )}
           </ul>
