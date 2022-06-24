@@ -324,8 +324,7 @@ function App() {
                     setRelations(new_relations);
                   }}>
                     Update text
-                </button>
-              <p>{entity.score}</p>
+                </button> {entity.score}
               </li>
             )}
           </ul>
