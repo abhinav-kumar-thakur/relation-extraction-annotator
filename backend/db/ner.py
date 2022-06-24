@@ -31,7 +31,11 @@ def get_next_raw_data(state: str, offset: int):
     Returns the next raw data from the database.
     """
 
-    data = db.raw_data.find({'status': state}).sort('_id').skip(offset).limit(1);
+    if state == 'all':
+        data = db.raw_data.find().sort('_id').skip(offset).limit(1);
+    else:
+        data = db.raw_data.find({'status': state}).sort('_id').skip(offset).limit(1);
+    
     data = list(data)
     if not data:
         return None

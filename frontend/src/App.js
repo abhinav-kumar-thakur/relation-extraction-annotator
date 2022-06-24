@@ -14,7 +14,7 @@ function App() {
   const [isDataFileSelected, setIsDataFileSelected] = useState(false);
 
   // Fetch next
-  const [nextFetchFilter, setNextFetchFilter] = useState('pending');
+  const [nextFetchFilter, setNextFetchFilter] = useState('all');
   const [nextOffset, setNextOffset] = useState(-1);
 
   // NER types
@@ -209,6 +209,7 @@ function App() {
             setEntities([]);
             setRelations([]);
             }}>
+            <option value='all'>All</option>
             <option value='pending'>Pending</option>
             <option value='approved'>Approved</option>
             <option value='flag'>Flag</option>
@@ -276,7 +277,7 @@ function App() {
               <li style={{width: '100%'}}>
                 <p>{entity.text}</p>
                 <button pos={index} onClick={handleRemoveEntity}>Delete</button>
-                <select name='Entity Type' id={`${index}_entity_type`} defaultValue={entity.type} onChange={(e) => {
+                <select name='Entity Type' id={`${index}_entity_type`} value={entity.type} onChange={(e) => {
                   const new_entities = entities.map((entity, i) => {
                     if (i === index) {
                       return { text: entity.text, type: e.target.value, start: entity.start, end: entity.end }
@@ -340,7 +341,7 @@ function App() {
             {relations.map((relation, index) => <li pos={index}>
             <button onClick={handleRemoveRelation}> Delete</button>
               {' ' + relation.head.text + ' '}
-              <select name='Relation Type' id={`${index}_relation_type`} defaultValue={relation.type} onChange={(e) => {
+              <select name='Relation Type' id={`${index}_relation_type`} value={relation.type} onChange={(e) => {
                   const new_relations = relations.map((rel, i) => {
                     if (i === index) {
                       return { head: relation.head, type: e.target.value, tail: relation.tail }
