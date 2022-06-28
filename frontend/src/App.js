@@ -41,6 +41,9 @@ function App() {
   const [selectedRelationType, setSelectedRelationType] = useState(relationTypes[0]);
   const [selectedFromEntity, setSelectedFromEntity] = useState('None');
   const [selectedToEntity, setSelectedToEntity] = useState('None');
+  
+  // control Panel Message
+  const [controlPanelMessage, setControlPanelMessage] = useState(` Hint: Start with 'Get types'`)
 
   // Handlers
   const handleRemoveEntity = (e) => {
@@ -107,7 +110,8 @@ function App() {
       .then((response) => response.json())
       .then((result) => {
         setEntityTypes(result['entities']);
-        setRelationTypes(result['relations'])
+        setRelationTypes(result['relations']);
+        setControlPanelMessage(` Hint: Use 'Get next/prev to navigate'`);
       })
       .catch((error) => { console.error('Error:', error) });
   };
@@ -149,6 +153,7 @@ function App() {
           setEntities(r_entities);
           setRelations(r_relations);
           setNextOffset(fetch_offset);
+          setControlPanelMessage(` Status: ${result['status']}`)
         } else {
           setTextData(['No more data']);
           setEntities([]);
@@ -156,6 +161,7 @@ function App() {
           if (nextOffset > -1) {
             setNextOffset(fetch_offset);
           }
+          setControlPanelMessage(` Hint: Navigate in opposite direction`)
       }})
       .catch((error) => { console.error('Error:', error) });
   };
@@ -185,11 +191,15 @@ function App() {
       .then((response) => response.json())
       .then((result) => { 
         console.log('Success:', result) ;
-        if (nextFetchFilter !== state) {
+        setControlPanelMessage(` Updated status: ${state}`);
+        if (nextFetchFilter !== state && nextFetchFilter !== 'all') {
           setNextOffset(nextOffset - 1);
         }
       })
-      .catch((error) => { console.error('Error:', error) });
+      .catch((error) => { 
+        console.error('Error:', error);
+        setControlPanelMessage(` Update status failed`);
+       });
   };
 
   // NER labelling UI
@@ -225,6 +235,7 @@ function App() {
             setTextData([]);
             setEntities([]);
             setRelations([]);
+            setControlPanelMessage(` Hint: Use 'Get next/prev to navigate'`);
             }}>
             <option value='all'>All</option>
             <option value='pending'>Pending</option>
@@ -237,6 +248,7 @@ function App() {
           <button onClick={getTypesHandler}>Get types</button>
           <button onClick={() => changeStateHandler('approved')}>Approve</button>
           <button onClick={() => changeStateHandler('flag')}>Flag</button>
+          <text>{controlPanelMessage}</text>
         </span>
         <hr/>
         <div className='ActionPanel'>
