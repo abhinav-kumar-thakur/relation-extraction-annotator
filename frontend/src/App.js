@@ -8,10 +8,12 @@ function App() {
   // NER Types file states
   const [selectedEntityTypesFile, setSelectedEntityTypesFile] = useState();
   const [isEntityTypesFileSelected, setIsEntityTypesFileSelected] = useState(false);
+  const [uploadEntityButtonText, setUploadEntityButtonText] = useState('Upload')
 
   // data file states
   const [selectedDataFile, setSelectedDataFile] = useState();
   const [isDataFileSelected, setIsDataFileSelected] = useState(false);
+  const [uploadDataFileButtonText, setUploadDataFileButtonText] = useState('Upload')
 
   // Fetch next
   const [nextFetchFilter, setNextFetchFilter] = useState('all');
@@ -59,6 +61,7 @@ function App() {
 
   const entityTypesFileChangeHandler = (event) => {
     setSelectedEntityTypesFile(event.target.files[0]);
+    setUploadEntityButtonText('Upload');
     setIsEntityTypesFileSelected(true);
   };
 
@@ -67,8 +70,14 @@ function App() {
     formData.append('File', selectedEntityTypesFile);
     fetch(backend_url + '/types/upload', { method: 'POST', body: formData })
       .then((response) => response.json())
-      .then((result) => { console.log('Success:', result) })
-      .catch((error) => { console.error('Error:', error) });
+      .then((result) => { 
+        console.log('Success:', result);
+        setUploadEntityButtonText('Uploaded');
+      })
+      .catch((error) => { 
+        console.error('Error:', error);
+        setUploadEntityButtonText('Failed');
+      });
   };
 
   const handleDataFileSubmission = () => {
@@ -76,12 +85,20 @@ function App() {
     formData.append('File', selectedDataFile);
     fetch(backend_url + '/raw/upload', { method: 'POST', body: formData })
       .then((response) => response.json())
-      .then((result) => { console.log('Success:', result) })
-      .catch((error) => { console.error('Error:', error) });
+      .then((result) => { 
+        console.log('Success:', result);
+        setUploadDataFileButtonText('Uploaded');
+      })
+      .catch((error) => { 
+        console.error('Error:', error);
+        setUploadDataFileButtonText('Failed');
+
+      });
   };
 
   const dataFileChangeHandler = (event) => {
     setSelectedDataFile(event.target.files[0]);
+    setUploadDataFileButtonText('Upload');
     setIsDataFileSelected(true);
   };
 
@@ -178,22 +195,22 @@ function App() {
   // NER labelling UI
   return (
     <div>
-      <div className='ControlPanel'>
-        <div className="NER_types_inputs">
+    <div className="NER_types_inputs">
           <a href={backend_url + '/approved/download'} style={{'marginRight': '5%'}}>
             Download approved data
           </a>
           <span style={{'marginRight': '5%', 'border': '2px solid lightblue'}}>
             <label>Types file: </label>
             <input type="file" onChange={entityTypesFileChangeHandler} />
-            <button onClick={handleNERFileSubmission} disabled={!isEntityTypesFileSelected} >Upload</button>
+            <button onClick={handleNERFileSubmission} disabled={!isEntityTypesFileSelected} >{uploadEntityButtonText}</button>
           </span>
           <span style={{'marginRight': '5%', 'border': '2px solid lightblue'}}>
             <label>Data file: </label>
             <input type="file" onChange={dataFileChangeHandler} />
-            <button onClick={handleDataFileSubmission} disabled={!isDataFileSelected} >Upload</button>
+            <button onClick={handleDataFileSubmission} disabled={!isDataFileSelected} >{uploadDataFileButtonText}</button>
           </span>
-        </div>
+      </div>
+      <div className='ControlPanel'>
         <textarea className='Sentence' value={textData.join(' ')} onSelect={(event) => {
           const start = event.target.selectionStart;
           const end = event.target.selectionEnd;
