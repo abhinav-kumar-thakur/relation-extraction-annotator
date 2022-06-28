@@ -300,8 +300,8 @@ function App() {
       <hr/>
       <div className='LabelsWrapper'>
         <div className='Label'>
-          <p>Entities</p>
-          <ul>
+          <h4>Entities</h4>
+          <ul className='LabelList'>
             {entities.map((entity, index) => 
               <li style={{width: '100%'}}>
                 <p>{entity.text}</p>
@@ -364,11 +364,10 @@ function App() {
           </ul>
         </div>
         <div className='Label'>
-          <p>Relations</p>
-          <ul>
-            
+          <h4>Relations</h4>
+          <ul className='LabelList'>
             {relations.map((relation, index) => <li pos={index}>
-            <button onClick={handleRemoveRelation}> Delete</button>
+            <button  pos={index} onClick={handleRemoveRelation}> Delete</button>
               {' ' + relation.head.text + ' '}
               <select name='Relation Type' id={`${index}_relation_type`} value={relation.type} onChange={(e) => {
                   const new_relations = relations.map((rel, i) => {
@@ -384,7 +383,6 @@ function App() {
              {' ' + relation.tail.text}
              <p>{relation.score}</p>
              </li>)}
-             
           </ul>
         </div>
       </div>
