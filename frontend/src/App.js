@@ -323,9 +323,10 @@ function App() {
                     const entity_start = textData.indexOf(selected_tokens[0]);
                     const entity_end = textData.indexOf(selected_tokens[selected_tokens.length - 1]) + 1;
                     const old_entity = entities[index];
+                    const new_entity = { text: selectedText, type: entity.type, start: entity_start, end: entity_end }
                     const new_entities = entities.map((entity, i) => {
                       if (i === index) {
-                        return { text: selectedText, type: entity.type, start: entity_start, end: entity_end }
+                        return new_entity
                       }
                       return entity;
                     });
@@ -336,13 +337,12 @@ function App() {
                       let is_updated = false;
 
                       if (new_head.start === old_entity.start && new_head.end === old_entity.end) {
-                        console.log('head');
-                        new_head = { text: selectedText, type: relation.head.type, start: entity_start, end: entity_end };
+                        new_head = new_entity;
                         is_updated = true;
                       }
 
                       if (new_tail.start === old_entity.start && new_tail.end === old_entity.end) {
-                        new_tail = { text: selectedText, type: relation.tail.type, start: entity_start, end: entity_end };
+                        new_tail = new_entity;
                         is_updated = true;
                       }
 
