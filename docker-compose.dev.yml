@@ -23,7 +23,7 @@ services:
       - "11000:11000"
     command: sh run.sh
     depends_on:
-      - learning_e2e_db
+      - database
 
   frontend:
     container_name: learning_e2e_frontend
@@ -34,5 +34,5 @@ services:
     ports:
       - "11001:80"
     depends_on:
-      - learning_e2e_backend
+      - backend
 
