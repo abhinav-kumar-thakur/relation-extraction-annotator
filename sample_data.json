@@ -1,0 +1,27 @@
+[
+    {
+        "tokens": [ "A_of_type_E1", "has", "relation_R1", "with", "B_of_type_E2", "."],
+        "entities": [
+            {
+                "type": "E1_name",
+                "start": 0,
+                "end": 1,
+                "score": "Holds entity prediction score object."
+            },
+            {
+                "type": "E2_name",
+                "start": 4,
+                "end": 5,
+                "score": "Holds entity prediction score object."
+            }
+        ],
+        "relations": [
+            {
+                "type": "R1_name",
+                "head": 0,
+                "tail": 1,
+                "score": "Holds relation prediction score object."
+            }
+        ]
+    }
+]
