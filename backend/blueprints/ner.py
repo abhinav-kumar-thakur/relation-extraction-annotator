@@ -7,7 +7,7 @@ from flask import Blueprint, Response, request, jsonify
 from db.ner import upload_ner_types, get_ner_types
 from db.ner import upload_raw_data as upload_raw_data_db
 from db.ner import get_next_raw_data as get_next_raw_data_db
-from db.ner import update_raw_data, get_all_approved_raw_data
+from db.ner import update_raw_data, get_all_approved_raw_data, get_all_data
 
 
 ner_bp = Blueprint('ner', __name__)
@@ -90,5 +90,17 @@ def download_approved_data():
         mimetype='application/json',
         headers={
             'Content-Disposition': 'attachment;filename=approved_data.json'
+        }
+    )
+
+@ner_bp.route('/all/download', methods=['GET'])
+def download_all_data():
+    data = get_all_data()
+    
+    return Response(
+        json.dumps(data),
+        mimetype='application/json',
+        headers={
+            'Content-Disposition': 'attachment;filename=all_data.json'
         }
     )

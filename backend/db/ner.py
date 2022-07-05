@@ -60,3 +60,13 @@ def get_all_approved_raw_data():
         data['_id'] = str(data['_id'])
 
     return raw_data
+
+
+# Get all approved raw data
+def get_all_data():
+    raw_data = db.raw_data.find()
+    raw_data = list(raw_data)
+    for data in raw_data:
+        data['_id'] = str(data['_id'])
+
+    return raw_data

@@ -207,7 +207,10 @@ function App() {
     <div>
     <div className="NER_types_inputs">
           <a href={backend_url + '/approved/download'} style={{'marginRight': '5%'}}>
-            Download approved data
+            Download approved
+          </a>
+          <a href={backend_url + '/all/download'} style={{'marginRight': '5%'}}>
+            Download all
           </a>
           <span style={{'marginRight': '5%', 'border': '2px solid lightblue'}}>
             <label>Types file: </label>
