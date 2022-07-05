@@ -20,7 +20,8 @@ def get_ner_types():
 # Upload raw data to db
 def upload_raw_data(raw_data: Dict):
     for data in raw_data:
-        data['status'] = 'pending'
+        if not 'status' in data:
+            data['status'] = 'pending'
     
     db.raw_data.delete_many({})
     db.raw_data.insert_many(raw_data)
