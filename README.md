@@ -78,6 +78,6 @@ Once the application is running, follow following steps to start NER labeling.
 2. Every time the application is reloaded:  Press the Get types button to fetch the entity and relation types before proceeding with any other task. This would be automated in further releases, but please follow this workaround for now.
 
 ### NER labeling UI Demo
-<img width="1427" alt="image" src="https://user-images.githubusercontent.com/14326083/177086846-fe0f43fe-4b50-434b-87f9-930895a94c2b.png">
+![image](https://user-images.githubusercontent.com/14326083/177373048-e8552172-fa3a-49fb-baf0-5151ddc60729.png)
 
 *Don't deploy in production with development credentials added in docker-compose.dev.yml*
