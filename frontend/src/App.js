@@ -133,7 +133,7 @@ function App() {
               type: entity['type'],
               start: entity['start'],
               end: entity['end'],
-              score: entity['score'] ? JSON.stringify(entity['score']) : ''
+              score: entity['score'] ? entity['score'] : null
             }
           });
 
@@ -142,7 +142,7 @@ function App() {
               'head': r_entities[relation['head']],
               'tail': r_entities[relation['tail']],
               'type': relation['type'],
-              'score': relation['score'] ? JSON.stringify(relation['score']) : ''
+              'score': relation['score'] ? relation['score'] : null
             }
           });
 
@@ -188,6 +188,11 @@ function App() {
     })
       .then((response) => response.json())
       .then((result) => { 
+        if (result['status'] === 'Failure') {
+          console.log('Error:', result) ;
+          setControlPanelMessage(` No update`);
+          return
+        }
         console.log('Success:', result) ;
         setControlPanelMessage(` Updated status: ${state}`);
         if (nextFetchFilter !== state && nextFetchFilter !== 'all') {
@@ -196,7 +201,7 @@ function App() {
       })
       .catch((error) => { 
         console.error('Error:', error);
-        setControlPanelMessage(` Update status failed`);
+        setControlPanelMessage(` Update status failed: ${error}`);
        });
   };
 
@@ -354,7 +359,7 @@ function App() {
                   }}>
                     Update text
                 </button>
-                <p>{entity.score}</p>
+                <p>{entity.score ? JSON.stringify(entity.score) : '' }</p>
               </li>
             )}
           </ul>
@@ -377,7 +382,7 @@ function App() {
                 {relationTypes.map((relationType, index) => <option value={relationType}>{relationType}</option>)}
               </select>
              {' ' + relation.tail.text}
-             <p>{relation.score}</p>
+             <p>{relation.score ? JSON.stringify(relation.score) : ''}</p>
              </li>)}
           </ul>
         </div>

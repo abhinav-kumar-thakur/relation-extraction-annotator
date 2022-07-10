@@ -47,10 +47,12 @@ def get_next_raw_data(state: str, offset: int):
 
 # Update raw data in db
 def update_raw_data(raw_data_id: str, data: Dict):
-    db.raw_data.update_one(
+    result = db.raw_data.update_one(
         {'_id': ObjectId(raw_data_id)},
         {'$set': data}
     )
+    
+    return int(result.raw_result['nModified']) == 1
 
 # Get all approved raw data
 def get_all_approved_raw_data():

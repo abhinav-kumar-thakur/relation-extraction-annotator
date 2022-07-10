@@ -78,7 +78,9 @@ def update_state(state):
         'relations': data['relations']
     }
 
-    update_raw_data(_id, updates)
+    if not update_raw_data(_id, updates):
+        return jsonify({'status': 'Failure', 'Error': 'No updates in database'})
+    
     return jsonify({'status': 'success'})
 
 @ner_bp.route('/approved/download', methods=['GET'])
