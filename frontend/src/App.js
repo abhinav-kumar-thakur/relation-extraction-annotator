@@ -28,9 +28,7 @@ function App() {
   const [sampleID, setSampleID] = useState(null);
 
   // Text selection states
-  const [selectedText, setSelectedText] = useState('');
-  const [selectedTextStart, setSelectedTextStart] = useState(null);
-  const [selectedTextEnd, setSelectedTextEnd] = useState(null);
+  const [textSelectionState, setTextSelectionState] = useState({text: '', start: -1, end: -1, valid: false});
 
   // Create Entity states
   const [entities, setEntities] = useState([]);
@@ -225,11 +223,12 @@ function App() {
       </div>
       <div className='ControlPanel'>
         <textarea className='Sentence' value={textData.join(' ')} onSelect={(event) => {
-          const start = event.target.selectionStart;
-          const end = event.target.selectionEnd;
-          setSelectedTextStart(start);
-          setSelectedTextEnd(end);
-          setSelectedText(event.target.value.substring(start, end));
+          const selection = event.target.value.substring(event.target.selectionStart, event.target.selectionEnd);
+          const selected_tokens = selection.trim().split(' ');
+          const selection_start = textData.indexOf(selected_tokens[0]);
+          const selection_end = selection_start > -1 ? textData.indexOf(selected_tokens[selected_tokens.length - 1]) + 1 : -1;
+          const isValid = selection_start !== -1 || selection_end !== -1;
+          setTextSelectionState({text: selected_tokens.join(' '), start: selection_start, end: selection_end, valid: isValid})
         }} />
         <span style={{'marginLeft': '30%'}}>
           <select name='Filter' id='filter' onChange={(event) => { 
@@ -259,14 +258,11 @@ function App() {
           <select name="Entity Types" id="entitytypes" onChange={(e) => { setSelectedEntityType(e.target.value) }}>
             {entityTypes.map((entityType, index) => <option value={entityType}>{entityType}</option>)}
           </select>
-          <p>Text: {selectedText}</p>
-          <p>Start: {textData.indexOf(selectedText.split(' ')[0])}</p>
-          <p>End: {textData.indexOf(selectedText.split(' ')[selectedText.split(' ').length - 1]) + 1}</p>
-          <button disabled={!selectedText} onClick={() => {
-            const selected_tokens = selectedText.split(' ');
-            const entity_start = textData.indexOf(selected_tokens[0]);
-            const entity_end = textData.indexOf(selected_tokens[selected_tokens.length - 1]) + 1;
-            const new_entities = entities.concat({ text: selectedText, type: selectedEntityType, start: entity_start, end: entity_end });
+          <p>Text: {textSelectionState.text}</p>
+          <p>Start: {textSelectionState.start}</p>
+          <p>End: {textSelectionState.end}</p>
+          <button disabled={!textSelectionState.valid} onClick={() => {
+            const new_entities = entities.concat({ text: textSelectionState.text, type: selectedEntityType, start: textSelectionState.start, end: textSelectionState.end });
             new_entities.sort((a, b) => a.start - b.start);
             setEntities(new_entities);
           }}>
@@ -321,12 +317,9 @@ function App() {
                 }}>
                   {entityTypes.map((entityType, index) => <option value={entityType}>{entityType}</option>)}
                 </select>
-                <button disabled={!selectedText} onClick={() => {
-                    const selected_tokens = selectedText.split(' ');
-                    const entity_start = textData.indexOf(selected_tokens[0]);
-                    const entity_end = textData.indexOf(selected_tokens[selected_tokens.length - 1]) + 1;
+                <button disabled={!textSelectionState.valid} onClick={() => {
                     const old_entity = entities[index];
-                    const new_entity = { text: selectedText, type: entity.type, start: entity_start, end: entity_end }
+                    const new_entity = { text: textSelectionState.text, type: entity.type, start: textSelectionState.start, end: textSelectionState.end }
                     const new_entities = entities.map((entity, i) => {
                       if (i === index) {
                         return new_entity
