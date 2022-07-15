@@ -8,6 +8,7 @@ from db.ner import upload_ner_types, get_ner_types
 from db.ner import upload_raw_data as upload_raw_data_db
 from db.ner import get_next_raw_data as get_next_raw_data_db
 from db.ner import update_raw_data, get_all_approved_raw_data, get_all_data
+from db.ner import get_progress_db
 
 
 ner_bp = Blueprint('ner', __name__)
@@ -106,3 +107,7 @@ def download_all_data():
             'Content-Disposition': 'attachment;filename=all_data.json'
         }
     )
+
+@ner_bp.route('/progress', methods=['GET'])
+def get_progress():
+    return jsonify(get_progress_db())
