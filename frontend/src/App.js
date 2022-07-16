@@ -249,11 +249,32 @@ function App() {
       <div className='ControlPanel'>
         <textarea className='Sentence' value={textData.join(' ')} onSelect={(event) => {
           const selection = event.target.value.substring(event.target.selectionStart, event.target.selectionEnd);
+
+          let traveresed_length = 0;
+          let entity_start_index, entity_end_inedx;
+          for (const [i, token] of textData.entries()) {
+            
+            const token_start = traveresed_length;
+            const token_end = traveresed_length + token.length;
+            if (event.target.selectionStart >= token_start && event.target.selectionStart <= token_end) {
+              entity_start_index = i;
+              console.log('start');
+            }
+            
+            if (event.target.selectionEnd >= token_start && event.target.selectionEnd <= token_end) {
+              entity_end_inedx = i + 1;
+              console.log('end');
+            }
+
+            traveresed_length += token.length + 1;
+            if (entity_start_index && entity_end_inedx) {
+              break;
+            }
+          }
+
           const selected_tokens = selection.trim().split(' ');
-          const selection_start = textData.indexOf(selected_tokens[0]);
-          const selection_end = selection_start > -1 ? textData.indexOf(selected_tokens[selected_tokens.length - 1]) + 1 : -1;
-          const isValid = selection_start !== -1 || selection_end !== -1;
-          setTextSelectionState({text: selected_tokens.join(' '), start: selection_start, end: selection_end, valid: isValid})
+          const isValid = entity_start_index && entity_end_inedx;
+          setTextSelectionState({text: selected_tokens.join(' '), start: entity_start_index, end: entity_end_inedx, valid: isValid});
         }} />
         <span style={{'marginLeft': '30%'}}>
           <select name='Filter' id='filter' onChange={(event) => { 
