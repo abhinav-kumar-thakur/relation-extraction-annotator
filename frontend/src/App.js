@@ -1,22 +1,24 @@
 import './App.css';
 
+import { v4 as uuidv4 } from 'uuid';
 import React, { useState } from 'react';
 import StackedProgressBar from './components/progessBar';
 
 function App() {
   const backend_url = 'api/ner';
+  
   // Progress bar
   const [progress, setProgress] = useState(null);
 
   // NER Types file states
   const [selectedEntityTypesFile, setSelectedEntityTypesFile] = useState();
   const [isEntityTypesFileSelected, setIsEntityTypesFileSelected] = useState(false);
-  const [uploadEntityButtonText, setUploadEntityButtonText] = useState('Upload')
+  const [uploadEntityButtonText, setUploadEntityButtonText] = useState('Upload');
 
   // data file states
   const [selectedDataFile, setSelectedDataFile] = useState();
   const [isDataFileSelected, setIsDataFileSelected] = useState(false);
-  const [uploadDataFileButtonText, setUploadDataFileButtonText] = useState('Upload')
+  const [uploadDataFileButtonText, setUploadDataFileButtonText] = useState('Upload');
 
   // Fetch next
   const [nextFetchFilter, setNextFetchFilter] = useState('all');
@@ -96,7 +98,6 @@ function App() {
       .catch((error) => { 
         console.error('Error:', error);
         setUploadDataFileButtonText('Failed');
-
       });
   };
 
@@ -144,6 +145,7 @@ function App() {
           const r_tokens = result['tokens'];
           const r_entities = result['entities'].map((entity) => {
             return {
+              id: uuidv4(),
               text: r_tokens.slice(entity['start'], entity['end']).join(' '),
               type: entity['type'],
               start: entity['start'],
@@ -154,10 +156,11 @@ function App() {
 
           const r_relations = result['relations'].map((relation) => {
             return {
-              'head': r_entities[relation['head']],
-              'tail': r_entities[relation['tail']],
-              'type': relation['type'],
-              'score': relation['score'] ? relation['score'] : null
+              id: uuidv4(),
+              head: r_entities[relation['head']],
+              tail: r_entities[relation['tail']],
+              type: relation['type'],
+              score: relation['score'] ? relation['score'] : null
             }
           });
 
@@ -284,7 +287,7 @@ function App() {
           <p>Start: {textSelectionState.start}</p>
           <p>End: {textSelectionState.end}</p>
           <button disabled={!textSelectionState.valid} onClick={() => {
-            const new_entities = entities.concat({ text: textSelectionState.text, type: selectedEntityType, start: textSelectionState.start, end: textSelectionState.end });
+            const new_entities = entities.concat({ id: uuidv4(), text: textSelectionState.text, type: selectedEntityType, start: textSelectionState.start, end: textSelectionState.end });
             new_entities.sort((a, b) => a.start - b.start);
             setEntities(new_entities);
           }}>
@@ -311,7 +314,7 @@ function App() {
             {entities.map((entity, index) => <option value={entity.text}> {entity.text} </option>)}
           </select></span>
           <button disabled={selectedFromEntity === "None" && selectedToEntity === "None"} onClick={() => {
-            setRelations(relations.concat({ head: selectedFromEntity, type: selectedRelationType, tail: selectedToEntity }));
+            setRelations(relations.concat({id: uuidv4(), head: selectedFromEntity, type: selectedRelationType, tail: selectedToEntity }));
           }}>
             Add Relation
           </button>
