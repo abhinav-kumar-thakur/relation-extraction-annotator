@@ -72,3 +72,17 @@ def get_all_data():
         data['_id'] = str(data['_id'])
 
     return raw_data
+
+# Get progress
+def get_progress_db():
+    counts = list(db.raw_data.aggregate([{"$group" : {"_id":"$status", "count":{"$sum":1}}}]))
+
+    total = 0
+    progress = {}
+    for status_count in counts:
+        count = status_count['count']
+        total +=  count
+        progress[status_count['_id']] = count
+
+    progress['total'] = total
+    return progress

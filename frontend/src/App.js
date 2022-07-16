@@ -1,9 +1,12 @@
 import './App.css';
 
 import React, { useState } from 'react';
+import StackedProgressBar from './components/progessBar';
 
 function App() {
   const backend_url = 'api/ner';
+  // Progress bar
+  const [progress, setProgress] = useState(null);
 
   // NER Types file states
   const [selectedEntityTypesFile, setSelectedEntityTypesFile] = useState();
@@ -114,8 +117,20 @@ function App() {
       .catch((error) => { console.error('Error:', error) });
   };
 
+  const updateProgress = () => {
+    fetch(backend_url + `/progress`, { method: 'GET' })
+    .then((response) => response.json())
+    .then((result) => setProgress(result))
+    .catch((error) => {
+      console.log(error);
+      setProgress(null)
+    });
+  };
+
   const getNextHandler = (offset_update) => {
     const fetch_offset = nextOffset + offset_update;
+    updateProgress();
+
     fetch(backend_url + `/raw/next/${nextFetchFilter}/${fetch_offset}`, { method: 'GET' })
       .then((response) => {
         if (response.status === 200) {
@@ -185,8 +200,7 @@ function App() {
       headers: {
         'Content-Type': 'application/json'
       }
-    })
-      .then((response) => response.json())
+    }).then((response) => response.json())
       .then((result) => { 
         if (result['status'] === 'Failure') {
           console.log('Error:', result) ;
@@ -198,6 +212,8 @@ function App() {
         if (nextFetchFilter !== state && nextFetchFilter !== 'all') {
           setNextOffset(nextOffset - 1);
         }
+
+        updateProgress();
       })
       .catch((error) => { 
         console.error('Error:', error);
@@ -208,6 +224,7 @@ function App() {
   // NER labelling UI
   return (
     <div>
+    <StackedProgressBar data={progress}/>
     <div className="NER_types_inputs">
           <a href={backend_url + '/approved/download'} style={{'marginRight': '5%'}}>
             Download approved
