@@ -1,30 +1,32 @@
 import './App.css';
 
+import { v4 as uuidv4 } from 'uuid';
 import React, { useState } from 'react';
 import StackedProgressBar from './components/progessBar';
 
 function App() {
   const backend_url = 'api/ner';
+  
   // Progress bar
   const [progress, setProgress] = useState(null);
 
   // NER Types file states
   const [selectedEntityTypesFile, setSelectedEntityTypesFile] = useState();
   const [isEntityTypesFileSelected, setIsEntityTypesFileSelected] = useState(false);
-  const [uploadEntityButtonText, setUploadEntityButtonText] = useState('Upload')
+  const [uploadEntityButtonText, setUploadEntityButtonText] = useState('Upload');
 
   // data file states
   const [selectedDataFile, setSelectedDataFile] = useState();
   const [isDataFileSelected, setIsDataFileSelected] = useState(false);
-  const [uploadDataFileButtonText, setUploadDataFileButtonText] = useState('Upload')
+  const [uploadDataFileButtonText, setUploadDataFileButtonText] = useState('Upload');
 
   // Fetch next
   const [nextFetchFilter, setNextFetchFilter] = useState('all');
   const [nextOffset, setNextOffset] = useState(-1);
 
   // NER types
-  const [entityTypes, setEntityTypes] = useState(['Upload Types File']);
-  const [relationTypes, setRelationTypes] = useState(['Upload Types File']);
+  const [entityTypes, setEntityTypes] = useState([]);
+  const [relationTypes, setRelationTypes] = useState([]);
 
   // Text data
   const [textData, setTextData] = useState([]);
@@ -35,31 +37,29 @@ function App() {
 
   // Create Entity states
   const [entities, setEntities] = useState([]);
-  const [selectedEntityType, setSelectedEntityType] = useState(entityTypes[0]);
+  const [selectedEntityType, setSelectedEntityType] = useState(null);
 
   // Create Relation states
   const [relations, setRelations] = useState([]);
-  const [selectedRelationType, setSelectedRelationType] = useState(relationTypes[0]);
-  const [selectedFromEntity, setSelectedFromEntity] = useState('None');
-  const [selectedToEntity, setSelectedToEntity] = useState('None');
+  const [selectedRelationType, setSelectedRelationType] = useState(null);
+  const [selectedFromEntity, setSelectedFromEntity] = useState(null);
+  const [selectedToEntity, setSelectedToEntity] = useState(null);
   
   // control Panel Message
   const [controlPanelMessage, setControlPanelMessage] = useState(` Hint: Start with 'Get types'`)
 
   // Handlers
   const handleRemoveEntity = (e) => {
-    const indexToRemove = e.target.getAttribute("pos");
-    const entityToRemove = entities[indexToRemove];
-    const newEntities = entities.filter((entity, index) => entity !== entityToRemove);
-    const newRelations = relations.filter((relation, index) => relation.head.text !== entityToRemove.text && relation.tail.text !== entityToRemove.text);
+    const entityIdToRemove = e.target.getAttribute("id");
+    const newEntities = entities.filter((entity) => entity.id !== entityIdToRemove);
+    const newRelations = relations.filter((relation) => relation.head.id !== entityIdToRemove && relation.tail.id !== entityIdToRemove);
     setEntities(newEntities);
     setRelations(newRelations);
   };
 
   const handleRemoveRelation = (e) => {
-    const indexToRemove = e.target.getAttribute("pos");
-    const relationToRemove = relations[indexToRemove];
-    const newRelations = relations.filter((relation, index) => relation !== relationToRemove);
+    const relationIdToRemove = e.target.getAttribute("id");
+    const newRelations = relations.filter((relation) => relation.id !== relationIdToRemove);
     setRelations(newRelations);
   };
 
@@ -96,7 +96,6 @@ function App() {
       .catch((error) => { 
         console.error('Error:', error);
         setUploadDataFileButtonText('Failed');
-
       });
   };
 
@@ -144,6 +143,7 @@ function App() {
           const r_tokens = result['tokens'];
           const r_entities = result['entities'].map((entity) => {
             return {
+              id: uuidv4(),
               text: r_tokens.slice(entity['start'], entity['end']).join(' '),
               type: entity['type'],
               start: entity['start'],
@@ -154,10 +154,11 @@ function App() {
 
           const r_relations = result['relations'].map((relation) => {
             return {
-              'head': r_entities[relation['head']],
-              'tail': r_entities[relation['tail']],
-              'type': relation['type'],
-              'score': relation['score'] ? relation['score'] : null
+              id: uuidv4(),
+              head: r_entities[relation['head']],
+              tail: r_entities[relation['tail']],
+              type: relation['type'],
+              score: relation['score'] ? relation['score'] : null
             }
           });
 
@@ -246,11 +247,30 @@ function App() {
       <div className='ControlPanel'>
         <textarea className='Sentence' value={textData.join(' ')} onSelect={(event) => {
           const selection = event.target.value.substring(event.target.selectionStart, event.target.selectionEnd);
+
+          let traveresed_length = 0;
+          let entity_start_index, entity_end_inedx;
+          for (const [i, token] of textData.entries()) {
+            
+            const token_start = traveresed_length;
+            const token_end = traveresed_length + token.length;
+            if (event.target.selectionStart >= token_start && event.target.selectionStart <= token_end) {
+              entity_start_index = i;
+            }
+            
+            if (event.target.selectionEnd >= token_start && event.target.selectionEnd <= token_end) {
+              entity_end_inedx = i + 1;
+            }
+
+            traveresed_length += token.length + 1;
+            if (entity_start_index && entity_end_inedx) {
+              break;
+            }
+          }
+
           const selected_tokens = selection.trim().split(' ');
-          const selection_start = textData.indexOf(selected_tokens[0]);
-          const selection_end = selection_start > -1 ? textData.indexOf(selected_tokens[selected_tokens.length - 1]) + 1 : -1;
-          const isValid = selection_start !== -1 || selection_end !== -1;
-          setTextSelectionState({text: selected_tokens.join(' '), start: selection_start, end: selection_end, valid: isValid})
+          const isValid = entity_start_index && entity_end_inedx;
+          setTextSelectionState({text: selected_tokens.join(' '), start: entity_start_index, end: entity_end_inedx, valid: isValid});
         }} />
         <span style={{'marginLeft': '30%'}}>
           <select name='Filter' id='filter' onChange={(event) => { 
@@ -278,13 +298,14 @@ function App() {
         <div className='ActionPanel'>
           <p> Entity Types: </p>
           <select name="Entity Types" id="entitytypes" onChange={(e) => { setSelectedEntityType(e.target.value) }}>
-            {entityTypes.map((entityType, index) => <option value={entityType}>{entityType}</option>)}
+            <option value={null}>Select Entity Type</option>
+            {entityTypes.map((entityType) => <option value={entityType}>{entityType}</option>)}
           </select>
           <p>Text: {textSelectionState.text}</p>
           <p>Start: {textSelectionState.start}</p>
           <p>End: {textSelectionState.end}</p>
-          <button disabled={!textSelectionState.valid} onClick={() => {
-            const new_entities = entities.concat({ text: textSelectionState.text, type: selectedEntityType, start: textSelectionState.start, end: textSelectionState.end });
+          <button disabled={!textSelectionState.valid || !selectedEntityType} onClick={() => {
+            const new_entities = entities.concat({ id: uuidv4(), text: textSelectionState.text, type: selectedEntityType, start: textSelectionState.start, end: textSelectionState.end });
             new_entities.sort((a, b) => a.start - b.start);
             setEntities(new_entities);
           }}>
@@ -294,24 +315,25 @@ function App() {
         <hr/>
         <div className='ActionPanel'>
           <span> From Entity: <select name="Relation Types" id="entitytypes" onChange={(e) => {
-            const selected_entity = entities.filter((entity) => entity.text === e.target.value)[0];
-            setSelectedFromEntity(selected_entity)
+            const selected_entity = e.target.value ? entities.filter((entity) => entity.id === e.target.value)[0] : null;
+            setSelectedFromEntity(selected_entity);
           }}>
-            <option value="None">None</option>
-            {entities.map((entity, index) => <option value={entity.text}> {entity.text} </option>)}
+            <option>Select Entity</option>
+            {entities.map((entity) => <option value={entity.id}>{entity.text} ({entity.start})</option>)}
           </select></span>
           <span> Relation Type: <select name="Relation Types" id="entitytypes" onChange={(e) => { setSelectedRelationType(e.target.value) }}>
-            {relationTypes.map((relationType, index) => <option value={relationType}> {relationType} </option>)}
+            <option value={null}>Select Relation Type</option>
+            {relationTypes.map((relationType) => <option value={relationType}> {relationType} </option>)}
           </select></span>
           <span> To Entity: <select name="Relation Types" id="entitytypes" onChange={(e) => {
-            const selected_entity = entities.filter((entity) => entity.text === e.target.value)[0];
-            setSelectedToEntity(selected_entity)
+            const selected_entity = e.target.value ? entities.filter((entity) => entity.id === e.target.value)[0] : null;
+            setSelectedToEntity(selected_entity);
           }}>
-            <option value="None">None</option>
-            {entities.map((entity, index) => <option value={entity.text}> {entity.text} </option>)}
+            <option>Select Entity</option>
+            {entities.map((entity) => <option value={entity.id}>{entity.text} ({entity.start})</option>)}
           </select></span>
-          <button disabled={selectedFromEntity === "None" && selectedToEntity === "None"} onClick={() => {
-            setRelations(relations.concat({ head: selectedFromEntity, type: selectedRelationType, tail: selectedToEntity }));
+          <button disabled={!(selectedFromEntity && selectedToEntity) || !selectedRelationType} onClick={() => {
+            setRelations(relations.concat({id: uuidv4(), head: selectedFromEntity, type: selectedRelationType, tail: selectedToEntity }));
           }}>
             Add Relation
           </button>
@@ -325,9 +347,9 @@ function App() {
           <ul className='LabelList'>
             {entities.map((entity, index) => 
               <li style={{width: '100%'}}>
-                <p>{entity.text}</p>
-                <button pos={index} onClick={handleRemoveEntity}>Delete</button>
-                <select name='Entity Type' id={`${index}_entity_type`} value={entity.type} onChange={(e) => {
+                <p>{entity.text} ({entity.start})</p>
+                <button id={entity.id} onClick={handleRemoveEntity}>Delete</button>
+                <select name='Entity Type' value={entity.type} onChange={(e) => {
                   const new_entities = entities.map((entity, i) => {
                     if (i === index) {
                       return { text: entity.text, type: e.target.value, start: entity.start, end: entity.end }
@@ -385,8 +407,8 @@ function App() {
           <h4>Relations</h4>
           <ul className='LabelList'>
             {relations.map((relation, index) => <li pos={index}>
-            <button  pos={index} onClick={handleRemoveRelation}> Delete</button>
-              {' ' + relation.head.text + ' '}
+            <button id={relation.id} onClick={handleRemoveRelation}> Delete</button>
+                {' ' + relation.head.text} ({relation.head.start})
               <select name='Relation Type' id={`${index}_relation_type`} value={relation.type} onChange={(e) => {
                   const new_relations = relations.map((rel, i) => {
                     if (i === index) {
@@ -396,9 +418,9 @@ function App() {
                   });
                   setRelations(new_relations);
                 }}>
-                {relationTypes.map((relationType, index) => <option value={relationType}>{relationType}</option>)}
+                {relationTypes.map((relationType) => <option value={relationType}>{relationType}</option>)}
               </select>
-             {' ' + relation.tail.text}
+              {' ' + relation.tail.text} ({relation.tail.start})
              <p>{relation.score ? JSON.stringify(relation.score) : ''}</p>
              </li>)}
           </ul>
