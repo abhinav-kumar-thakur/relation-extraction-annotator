@@ -5,6 +5,8 @@ services:
     container_name: learning_e2e_db
     image: mongo
     restart: always
+    volumes:
+      - ./data/db:/data/db
     ports:
       - "27017:27017"
     environment:
