@@ -224,8 +224,6 @@ function App() {
   };
 
   const textSelectionHandler = (event) => {
-    const selection = event.target.value.substring(event.target.selectionStart, event.target.selectionEnd);
-
     let traversed_length = 0;
     let entity_start_index, entity_end_inedx;
     for (const [i, token] of textData.entries()) {
@@ -246,9 +244,9 @@ function App() {
       }
     }
 
-    const selected_tokens = selection.trim().split(' ');
     const isValid = entity_start_index && entity_end_inedx;
-    setTextSelectionState({text: selected_tokens.join(' '), start: entity_start_index, end: entity_end_inedx, valid: isValid});
+    const selectionText = textData.slice(entity_start_index, entity_end_inedx).join(' ');
+    setTextSelectionState({text: selectionText, start: entity_start_index, end: entity_end_inedx, valid: isValid});
   }
 
   // NER labelling UI

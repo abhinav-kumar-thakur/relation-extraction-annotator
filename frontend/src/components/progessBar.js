@@ -11,7 +11,7 @@ function StackedProgressBar(props) {
           </ProgressBar>
       );
   }
-  
+
   const data = props.data;
   const approved_count = data.approved ? data.approved : 0;
   const pending_count = data.pending ? data.pending : 0;
