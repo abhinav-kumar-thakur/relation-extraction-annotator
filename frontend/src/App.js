@@ -223,56 +223,54 @@ function App() {
        });
   };
 
+  const textSelectionHandler = (event) => {
+    const selection = event.target.value.substring(event.target.selectionStart, event.target.selectionEnd);
+
+    let traversed_length = 0;
+    let entity_start_index, entity_end_inedx;
+    for (const [i, token] of textData.entries()) {
+
+      const token_start = traversed_length;
+      const token_end = traversed_length + token.length;
+      if (event.target.selectionStart >= token_start && event.target.selectionStart <= token_end) {
+        entity_start_index = i;
+      }
+
+      if (event.target.selectionEnd >= token_start && event.target.selectionEnd <= token_end) {
+        entity_end_inedx = i + 1;
+      }
+
+      traversed_length += token.length + 1;
+      if (entity_start_index && entity_end_inedx) {
+        break;
+      }
+    }
+
+    const selected_tokens = selection.trim().split(' ');
+    const isValid = entity_start_index && entity_end_inedx;
+    setTextSelectionState({text: selected_tokens.join(' '), start: entity_start_index, end: entity_end_inedx, valid: isValid});
+  }
+
   // NER labelling UI
   return (
     <div>
-    <StackedProgressBar data={progress}/>
     <div className="NER_types_inputs">
-          <a href={backend_url + '/approved/download'} style={{'marginRight': '5%'}}>
-            Download approved
-          </a>
-          <a href={backend_url + '/all/download'} style={{'marginRight': '5%'}}>
-            Download all
-          </a>
-          <span style={{'marginRight': '5%', 'border': '2px solid lightblue'}}>
-            <label>Types file: </label>
-            <input type="file" onChange={entityTypesFileChangeHandler} />
-            <button onClick={handleNERFileSubmission} disabled={!isEntityTypesFileSelected} >{uploadEntityButtonText}</button>
-          </span>
-          <span style={{'marginRight': '5%', 'border': '2px solid lightblue'}}>
-            <label>Data file: </label>
-            <input type="file" onChange={dataFileChangeHandler} />
-            <button onClick={handleDataFileSubmission} disabled={!isDataFileSelected} >{uploadDataFileButtonText}</button>
-          </span>
+        <span style={{'marginRight': '5%', 'border': '2px solid lightblue'}}>
+          <label>Types file: </label>
+          <input type="file" onChange={entityTypesFileChangeHandler} />
+          <button onClick={handleNERFileSubmission} disabled={!isEntityTypesFileSelected} >{uploadEntityButtonText}</button>
+        </span>
+        <span style={{'marginRight': '5%', 'border': '2px solid lightblue'}}>
+          <label>Data file: </label>
+          <input type="file" onChange={dataFileChangeHandler} />
+          <button onClick={handleDataFileSubmission} disabled={!isDataFileSelected} >{uploadDataFileButtonText}</button>
+        </span>
+        <a href={backend_url + '/approved/download'} style={{'marginRight': '1%'}}> Download approved </a>
+        <a href={backend_url + '/all/download'}> Download all </a>
       </div>
       <div className='ControlPanel'>
-        <textarea className='Sentence' value={textData.join(' ')} onSelect={(event) => {
-          const selection = event.target.value.substring(event.target.selectionStart, event.target.selectionEnd);
-
-          let traveresed_length = 0;
-          let entity_start_index, entity_end_inedx;
-          for (const [i, token] of textData.entries()) {
-            
-            const token_start = traveresed_length;
-            const token_end = traveresed_length + token.length;
-            if (event.target.selectionStart >= token_start && event.target.selectionStart <= token_end) {
-              entity_start_index = i;
-            }
-            
-            if (event.target.selectionEnd >= token_start && event.target.selectionEnd <= token_end) {
-              entity_end_inedx = i + 1;
-            }
-
-            traveresed_length += token.length + 1;
-            if (entity_start_index && entity_end_inedx) {
-              break;
-            }
-          }
-
-          const selected_tokens = selection.trim().split(' ');
-          const isValid = entity_start_index && entity_end_inedx;
-          setTextSelectionState({text: selected_tokens.join(' '), start: entity_start_index, end: entity_end_inedx, valid: isValid});
-        }} />
+        <StackedProgressBar data={progress}/>
+        <textarea className='Sentence' value={textData.join(' ')} onSelect={textSelectionHandler} />
         <span style={{'marginLeft': '30%'}}>
           <select name='Filter' id='filter' onChange={(event) => { 
             setNextOffset(-1); 
@@ -339,9 +337,7 @@ function App() {
             Add Relation
           </button>
         </div>
-        
       </div>
-      <hr/>
       <div className='LabelsWrapper'>
         <div className='Label'>
           <h4>Entities</h4>
