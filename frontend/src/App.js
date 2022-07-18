@@ -167,6 +167,7 @@ function App() {
           setEntities(r_entities);
           setRelations(r_relations);
           setNextOffset(fetch_offset);
+          setTextSelectionState({text: '', start: -1, end: -1, valid: false});
           setControlPanelMessage(` Status: ${result['status']}`)
         } else {
           setTextData(['No more data']);
