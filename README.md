@@ -13,6 +13,10 @@ Application will become available on [http://localhost:11001/](http://localhost:
 * [Setting up frontend locally](./frontend/README.md)
 
 ## NER labeling tool
+
+### NER labeling UI Demo
+![image](https://user-images.githubusercontent.com/14326083/179493581-ec518f10-5a5d-4174-9d92-43117e8fc5d6.png)
+
 Once the application is running, follow following steps to start NER labeling.
 1. One time / First time: Upload the types and data files manually. Upload of new types/data file completely removes previously stored values.
 
@@ -76,8 +80,5 @@ Once the application is running, follow following steps to start NER labeling.
 ]
 ```
 2. Every time the application is reloaded:  Press the Get types button to fetch the entity and relation types before proceeding with any other task. This would be automated in further releases, but please follow this workaround for now.
-
-### NER labeling UI Demo
-![image](https://user-images.githubusercontent.com/14326083/177373048-e8552172-fa3a-49fb-baf0-5151ddc60729.png)
 
 *Don't deploy in production with development credentials added in docker-compose.dev.yml*
