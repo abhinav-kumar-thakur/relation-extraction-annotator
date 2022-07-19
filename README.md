@@ -1,6 +1,7 @@
 # learning_e2e
 Web framework for end to end machine learning. Currently only NER data labeling is supported.
 
+* To run with last stable release: `git checkout v0.1.2`
 * Run the application in docker: `docker-compose -f docker-compose.dev.yml up -d`
 * To bring down the application: `docker-compose -f docker-compose.dev.yml down -v`
 * To check docker-compose logs: `docker-compose -f docker-compose.dev.yml logs`
