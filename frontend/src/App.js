@@ -382,7 +382,7 @@ function App() {
                       }
 
                       if (is_updated) {
-                        return { head: new_head, type: relation.type, tail: new_tail };
+                        return { id: relation.id, head: new_head, type: relation.type, tail: new_tail };
                       }
                       return relation
                     });
@@ -407,7 +407,7 @@ function App() {
               <select name='Relation Type' id={`${index}_relation_type`} value={relation.type} onChange={(e) => {
                   const new_relations = relations.map((rel, i) => {
                     if (i === index) {
-                      return { head: relation.head, type: e.target.value, tail: relation.tail }
+                      return { id: relation.id, head: relation.head, type: e.target.value, tail: relation.tail }
                     }
                     return rel;
                   });
