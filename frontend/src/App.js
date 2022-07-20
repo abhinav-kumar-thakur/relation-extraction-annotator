@@ -244,7 +244,7 @@ function App() {
       }
     }
 
-    const isValid = entity_start_index && entity_end_inedx;
+    const isValid = entity_start_index !== -1 && entity_end_inedx !== -1;
     const selectionText = textData.slice(entity_start_index, entity_end_inedx).join(' ');
     setTextSelectionState({text: selectionText, start: entity_start_index, end: entity_end_inedx, valid: isValid});
   }
@@ -347,7 +347,7 @@ function App() {
                 <select name='Entity Type' value={entity.type} onChange={(e) => {
                   const new_entities = entities.map((entity, i) => {
                     if (i === index) {
-                      return { text: entity.text, type: e.target.value, start: entity.start, end: entity.end }
+                      return { id: entity.id, text: entity.text, type: e.target.value, start: entity.start, end: entity.end }
                     }
                     return entity;
                   });
@@ -358,7 +358,7 @@ function App() {
                 </select>
                 <button disabled={!textSelectionState.valid} onClick={() => {
                     const old_entity = entities[index];
-                    const new_entity = { text: textSelectionState.text, type: entity.type, start: textSelectionState.start, end: textSelectionState.end }
+                    const new_entity = { id: entity.id, text: textSelectionState.text, type: entity.type, start: textSelectionState.start, end: textSelectionState.end }
                     const new_entities = entities.map((entity, i) => {
                       if (i === index) {
                         return new_entity
