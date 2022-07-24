@@ -3,22 +3,14 @@ import './App.css';
 import { v4 as uuidv4 } from 'uuid';
 import React, { useState } from 'react';
 import StackedProgressBar from './components/progessBar';
+import Header from './components/header/Header';
+import {backend_url} from './config/urls';
 
 function App() {
-  const backend_url = 'api/ner';
+  
   
   // Progress bar
   const [progress, setProgress] = useState(null);
-
-  // NER Types file states
-  const [selectedEntityTypesFile, setSelectedEntityTypesFile] = useState();
-  const [isEntityTypesFileSelected, setIsEntityTypesFileSelected] = useState(false);
-  const [uploadEntityButtonText, setUploadEntityButtonText] = useState('Upload');
-
-  // data file states
-  const [selectedDataFile, setSelectedDataFile] = useState();
-  const [isDataFileSelected, setIsDataFileSelected] = useState(false);
-  const [uploadDataFileButtonText, setUploadDataFileButtonText] = useState('Upload');
 
   // Fetch next
   const [nextFetchFilter, setNextFetchFilter] = useState('all');
@@ -61,48 +53,6 @@ function App() {
     const relationIdToRemove = e.target.getAttribute("id");
     const newRelations = relations.filter((relation) => relation.id !== relationIdToRemove);
     setRelations(newRelations);
-  };
-
-  const entityTypesFileChangeHandler = (event) => {
-    setSelectedEntityTypesFile(event.target.files[0]);
-    setUploadEntityButtonText('Upload');
-    setIsEntityTypesFileSelected(true);
-  };
-
-  const handleNERFileSubmission = () => {
-    const formData = new FormData();
-    formData.append('File', selectedEntityTypesFile);
-    fetch(backend_url + '/types/upload', { method: 'POST', body: formData })
-      .then((response) => response.json())
-      .then((result) => { 
-        console.log('Success:', result);
-        setUploadEntityButtonText('Uploaded');
-      })
-      .catch((error) => { 
-        console.error('Error:', error);
-        setUploadEntityButtonText('Failed');
-      });
-  };
-
-  const handleDataFileSubmission = () => {
-    const formData = new FormData();
-    formData.append('File', selectedDataFile);
-    fetch(backend_url + '/raw/upload', { method: 'POST', body: formData })
-      .then((response) => response.json())
-      .then((result) => { 
-        console.log('Success:', result);
-        setUploadDataFileButtonText('Uploaded');
-      })
-      .catch((error) => { 
-        console.error('Error:', error);
-        setUploadDataFileButtonText('Failed');
-      });
-  };
-
-  const dataFileChangeHandler = (event) => {
-    setSelectedDataFile(event.target.files[0]);
-    setUploadDataFileButtonText('Upload');
-    setIsDataFileSelected(true);
   };
 
   const getTypesHandler = () => {
@@ -252,20 +202,7 @@ function App() {
   // NER labelling UI
   return (
     <div>
-    <div className="NER_types_inputs">
-        <span style={{'marginRight': '5%', 'border': '2px solid lightblue'}}>
-          <label>Types file: </label>
-          <input type="file" onChange={entityTypesFileChangeHandler} />
-          <button onClick={handleNERFileSubmission} disabled={!isEntityTypesFileSelected} >{uploadEntityButtonText}</button>
-        </span>
-        <span style={{'marginRight': '5%', 'border': '2px solid lightblue'}}>
-          <label>Data file: </label>
-          <input type="file" onChange={dataFileChangeHandler} />
-          <button onClick={handleDataFileSubmission} disabled={!isDataFileSelected} >{uploadDataFileButtonText}</button>
-        </span>
-        <a href={backend_url + '/approved/download'} style={{'marginRight': '1%'}}> Download approved </a>
-        <a href={backend_url + '/all/download'}> Download all </a>
-      </div>
+      <Header/>
       <div className='ControlPanel'>
         <StackedProgressBar data={progress}/>
         <textarea className='Sentence' value={textData.join(' ')} onSelect={textSelectionHandler} />
