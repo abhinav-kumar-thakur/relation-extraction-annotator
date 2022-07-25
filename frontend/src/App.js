@@ -342,7 +342,7 @@ function App() {
           <ul className='LabelList'>
             {entities.map((entity, index) => 
               <li style={{width: '100%'}}>
-                <p>{entity.text} ({entity.start})</p>
+                <p>{entity.text} ({entity.start}, {entity.end})</p>
                 <button id={entity.id} onClick={handleRemoveEntity}>Delete</button>
                 <select name='Entity Type' value={entity.type} onChange={(e) => {
                   const new_entities = entities.map((entity, i) => {
