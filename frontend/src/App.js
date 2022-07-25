@@ -184,8 +184,8 @@ function App() {
   const changeStateHandler = (state) => {
     const request_relations = relations.map((relation) => {
       return {
-        'head': entities.findIndex((entity) => entity === relation.head),
-        'tail': entities.findIndex((entity) => entity === relation.tail),
+        'head': entities.findIndex((entity) => entity.id === relation.head.id),
+        'tail': entities.findIndex((entity) => entity.id === relation.tail.id),
         'type': relation.type
       }
     });
