@@ -316,7 +316,7 @@ function App() {
             setSelectedFromEntity(selected_entity);
           }}>
             <option>Select Entity</option>
-            {entities.map((entity) => <option value={entity.id}>{entity.text} ({entity.start})</option>)}
+            {entities.map((entity) => <option value={entity.id}>{entity.text} ({entity.start}, {entity.end})</option>)}
           </select></span>
           <span> Relation Type: <select name="Relation Types" id="entitytypes" onChange={(e) => { setSelectedRelationType(e.target.value) }}>
             <option value={null}>Select Relation Type</option>
@@ -327,7 +327,7 @@ function App() {
             setSelectedToEntity(selected_entity);
           }}>
             <option>Select Entity</option>
-            {entities.map((entity) => <option value={entity.id}>{entity.text} ({entity.start})</option>)}
+            {entities.map((entity) => <option value={entity.id}>{entity.text} ({entity.start}, {entity.end})</option>)}
           </select></span>
           <button disabled={!(selectedFromEntity && selectedToEntity) || !selectedRelationType} onClick={() => {
             setRelations(relations.concat({id: uuidv4(), head: selectedFromEntity, type: selectedRelationType, tail: selectedToEntity }));
