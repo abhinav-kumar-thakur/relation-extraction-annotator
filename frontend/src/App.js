@@ -184,8 +184,8 @@ function App() {
   const changeStateHandler = (state) => {
     const request_relations = relations.map((relation) => {
       return {
-        'head': entities.findIndex((entity) => entity === relation.head),
-        'tail': entities.findIndex((entity) => entity === relation.tail),
+        'head': entities.findIndex((entity) => entity.id === relation.head.id),
+        'tail': entities.findIndex((entity) => entity.id === relation.tail.id),
         'type': relation.type
       }
     });
@@ -316,7 +316,7 @@ function App() {
             setSelectedFromEntity(selected_entity);
           }}>
             <option>Select Entity</option>
-            {entities.map((entity) => <option value={entity.id}>{entity.text} ({entity.start})</option>)}
+            {entities.map((entity) => <option value={entity.id}>{entity.text} ({entity.start}, {entity.end})</option>)}
           </select></span>
           <span> Relation Type: <select name="Relation Types" id="entitytypes" onChange={(e) => { setSelectedRelationType(e.target.value) }}>
             <option value={null}>Select Relation Type</option>
@@ -327,7 +327,7 @@ function App() {
             setSelectedToEntity(selected_entity);
           }}>
             <option>Select Entity</option>
-            {entities.map((entity) => <option value={entity.id}>{entity.text} ({entity.start})</option>)}
+            {entities.map((entity) => <option value={entity.id}>{entity.text} ({entity.start}, {entity.end})</option>)}
           </select></span>
           <button disabled={!(selectedFromEntity && selectedToEntity) || !selectedRelationType} onClick={() => {
             setRelations(relations.concat({id: uuidv4(), head: selectedFromEntity, type: selectedRelationType, tail: selectedToEntity }));
@@ -342,7 +342,7 @@ function App() {
           <ul className='LabelList'>
             {entities.map((entity, index) => 
               <li style={{width: '100%'}}>
-                <p>{entity.text} ({entity.start})</p>
+                <p>{entity.text} ({entity.start}, {entity.end})</p>
                 <button id={entity.id} onClick={handleRemoveEntity}>Delete</button>
                 <select name='Entity Type' value={entity.type} onChange={(e) => {
                   const new_entities = entities.map((entity, i) => {
