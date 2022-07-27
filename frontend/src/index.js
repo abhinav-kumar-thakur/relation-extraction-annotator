@@ -1,15 +1,38 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {BrowserRouter, Route, Routes} from "react-router-dom";
+
+import './index.css';
+import Labeling from './pages/labeling/Labeling';
+import reportWebVitals from './reportWebVitals';
+import {Admin} from "./pages/admin/Admin";
+
+import Container from 'react-bootstrap/Container';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import {Home} from "./pages/learninge2e/LearningE2E";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    <React.StrictMode>
+        <BrowserRouter>
+            <Navbar bg="dark" variant="dark">
+                <Container>
+                    <Navbar.Brand href="/">Learning-e2e</Navbar.Brand>
+                    <Nav className="me-auto">
+                        <Nav.Link href="admin">Admin</Nav.Link>
+                        <Nav.Link href="labeling">Labeling</Nav.Link>
+                    </Nav>
+                </Container>
+            </Navbar>
+            <Routes>
+                <Route path="/" element={<Home/>}></Route>
+                <Route path="/labeling" element={<Labeling/>}></Route>
+                <Route path="/admin" element={<Admin/>}></Route>
+            </Routes>
+        </BrowserRouter>
+    </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
