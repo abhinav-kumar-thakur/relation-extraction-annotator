@@ -1,7 +1,14 @@
-const BackendUrl = 'api/ner';
+const BackendUrl = "api";
+const BackendDataURL = `${BackendUrl}/data`;
+const BackendAdminURL = BackendUrl + '/admin';
 
-export const TypeFileUploadURL = BackendUrl + '/types/upload';
-export const DataFileUploadURL = BackendUrl + '/raw/upload';
+export const TypeFileUploadURL = `${BackendAdminURL}/labels/upload`;
+export const RulesFileUploadURL = `${BackendAdminURL}/rules/upload`;
+export const GetTypesURL = `${BackendAdminURL}/labels`;
 
-export const DownloadAllURL = BackendUrl + '/all/download';
-export const DownloadApprovedURL = BackendUrl + '/approved/download';
+export const GetDataURL = `${BackendDataURL}/data`
+export const DataFileUploadURL = `${BackendDataURL}/upload`;
+export const DataDownloadURL = `${BackendDataURL}/download`;
+export const ApprovedDownloadURL = `${BackendDataURL}/approved/download`;
+export const LabelingProgressURL = `${BackendDataURL}/progress`;
+export const DataUpdateURL = `${BackendDataURL}/update/state`;

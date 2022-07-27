@@ -4,10 +4,9 @@ import {v4 as uuidv4} from 'uuid';
 import React, {useState} from 'react';
 import StackedProgressBar from '../../components/progressbar/progessBar';
 import CloseButton from 'react-bootstrap/CloseButton';
+import {DataUpdateURL, GetDataURL, GetTypesURL, LabelingProgressURL} from "../../configs/urls";
 
 function Labeling() {
-    const backend_url = 'api/ner';
-
     // Progress bar
     const [progress, setProgress] = useState(null);
 
@@ -55,7 +54,7 @@ function Labeling() {
     };
 
     const getTypesHandler = () => {
-        fetch(backend_url + '/types', {method: 'GET'})
+        fetch(GetTypesURL, {method: 'GET'})
             .then((response) => response.json())
             .then((result) => {
                 setEntityTypes(result['entities']);
@@ -68,7 +67,7 @@ function Labeling() {
     };
 
     const updateProgress = () => {
-        fetch(backend_url + `/progress`, {method: 'GET'})
+        fetch(LabelingProgressURL, {method: 'GET'})
             .then((response) => response.json())
             .then((result) => setProgress(result))
             .catch((error) => {
@@ -81,7 +80,7 @@ function Labeling() {
         const fetch_offset = nextOffset + offset_update;
         updateProgress();
 
-        fetch(backend_url + `/raw/next/${nextFetchFilter}/${fetch_offset}`, {method: 'GET'})
+        fetch(`${GetDataURL}/${nextFetchFilter}/${fetch_offset}`, {method: 'GET'})
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();
@@ -150,7 +149,7 @@ function Labeling() {
             'relations': request_relations
         };
 
-        fetch(backend_url + `/state/update/${state}`, {
+        fetch(`${DataUpdateURL}/${state}`, {
             method: 'POST',
             body: JSON.stringify(body),
             headers: {
@@ -301,7 +300,8 @@ function Labeling() {
                         {entities.map((entity, index) =>
                             <li style={{width: '100%'}}>
                                 <p>
-                                    <CloseButton id={entity.id} onClick={handleRemoveEntity}/> {entity.text} ({entity.start}, {entity.end})
+                                    <CloseButton id={entity.id}
+                                                 onClick={handleRemoveEntity}/> {entity.text} ({entity.start}, {entity.end})
                                 </p>
                                 <select name='Entity Type' value={entity.type} onChange={(e) => {
                                     const new_entities = entities.map((entity, i) => {

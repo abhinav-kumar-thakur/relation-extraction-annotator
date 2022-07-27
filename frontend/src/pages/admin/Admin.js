@@ -1,7 +1,13 @@
 import React from 'react';
 import {Container, Row, Tab, Tabs} from "react-bootstrap";
 import {FileUploader} from "../../components/fileuploader/FileUploader";
-import {TypeFileUploadURL, DataFileUploadURL, DownloadAllURL, DownloadApprovedURL} from "../../configs/urls"
+import {
+    TypeFileUploadURL,
+    DataFileUploadURL,
+    DataDownloadURL,
+    ApprovedDownloadURL,
+    RulesFileUploadURL
+} from "../../configs/urls"
 
 export function Admin() {
     return (<Tabs
@@ -16,6 +22,9 @@ export function Admin() {
                         <FileUploader title="Types file" upload_url={TypeFileUploadURL} />
                     </Row>
                     <Row>
+                        <FileUploader title="Rules file" upload_url={RulesFileUploadURL} />
+                    </Row>
+                    <Row>
                         <FileUploader title="Data file" upload_url={DataFileUploadURL} />
                     </Row>
                 </Container>
@@ -24,10 +33,10 @@ export function Admin() {
         <Tab eventKey="downloads" title="Downloads">
             <Container>
                 <Row>
-                    <a href={DownloadAllURL}>All</a>
+                    <a href={DataDownloadURL}>All</a>
                 </Row>
                 <Row>
-                    <a href={DownloadApprovedURL}>Approved</a>
+                    <a href={ApprovedDownloadURL}>Approved</a>
                 </Row>
             </Container>
         </Tab>
