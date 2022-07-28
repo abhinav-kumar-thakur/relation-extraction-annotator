@@ -52,6 +52,17 @@ function Labeling() {
         getNextHandler(1);
     }, [nextFetchFilter]);
 
+    //  Validate Relation
+    const isInValidRelation = () => {
+        const all_present = selectedFromEntity && selectedToEntity && selectedRelationType
+        if (all_present) {
+            const rule_key = `${selectedFromEntity.type}_${selectedToEntity.type}`
+            const valid_relations = rules.has(rule_key) ? rules.get(rule_key) : rules.get('default');
+            return !valid_relations.includes(selectedRelationType);
+        }
+        return !all_present
+    }
+
     // Handlers
     const handleRemoveEntity = (e) => {
         const entityIdToRemove = e.target.getAttribute("id");
@@ -83,8 +94,16 @@ function Labeling() {
         fetch(RulesURL, {method: 'GET'})
             .then((response) => response.json())
             .then((result) => {
-                setRules(result);
-                console.log(result);
+                const rulesMap = new Map();
+
+                const default_relations = result.default.relations ? result.default.relations : [];
+                rulesMap.set('default', default_relations);
+
+                for (const rule of result.rules) {
+                    rulesMap.set(`${rule.head}_${rule.tail}`, rule.relations)
+                }
+                
+                setRules(rulesMap);
             })
             .catch((error) => {
                 console.error('Error:', error)
@@ -322,7 +341,7 @@ function Labeling() {
                         {entities.map((entity) => <option value={entity.id}>{entity.text} ({entity.start}, {entity.end})</option>)}
                       </select>
                   </span>
-                  <button disabled={!(selectedFromEntity && selectedToEntity) || !selectedRelationType} onClick={addRelationHandler}>
+                  <button disabled={isInValidRelation()} onClick={addRelationHandler}>
                     Add Relation
                   </button>
                 </div>
