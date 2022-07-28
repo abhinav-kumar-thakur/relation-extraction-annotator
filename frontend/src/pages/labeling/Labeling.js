@@ -1,10 +1,10 @@
 import './Labeling.css';
 
 import {v4 as uuidv4} from 'uuid';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import StackedProgressBar from '../../components/progressbar/progessBar';
 import CloseButton from 'react-bootstrap/CloseButton';
-import {DataUpdateURL, GetDataURL, GetTypesURL, LabelingProgressURL} from "../../configs/urls";
+import {DataUpdateURL, GetDataURL, GetTypesURL, LabelingProgressURL, RulesURL} from "../../configs/urls";
 
 function Labeling() {
     // Progress bar
@@ -17,6 +17,9 @@ function Labeling() {
     // NER types
     const [entityTypes, setEntityTypes] = useState([]);
     const [relationTypes, setRelationTypes] = useState([]);
+
+    // Rules
+    const [rules, setRules] = useState(null);
 
     // Text data
     const [textData, setTextData] = useState([]);
@@ -36,7 +39,18 @@ function Labeling() {
     const [selectedToEntity, setSelectedToEntity] = useState(null);
 
     // control Panel Message
-    const [controlPanelMessage, setControlPanelMessage] = useState(` Hint: Start with 'Get types'`)
+    const [controlPanelMessage, setControlPanelMessage] = useState('')
+
+    // Use effects to fetch types and rules
+    useEffect(() => {
+        getTypesHandler();
+        getRulesHandler();
+        getNextHandler(1);
+    }, []);
+
+    useEffect(() => {
+        getNextHandler(1);
+    }, [nextFetchFilter]);
 
     // Handlers
     const handleRemoveEntity = (e) => {
@@ -59,7 +73,18 @@ function Labeling() {
             .then((result) => {
                 setEntityTypes(result['entities']);
                 setRelationTypes(result['relations']);
-                setControlPanelMessage(` Hint: Use 'Get next/prev to navigate'`);
+            })
+            .catch((error) => {
+                console.error('Error:', error)
+            });
+    };
+
+    const getRulesHandler = () => {
+        fetch(RulesURL, {method: 'GET'})
+            .then((response) => response.json())
+            .then((result) => {
+                setRules(result);
+                console.log(result);
             })
             .catch((error) => {
                 console.error('Error:', error)
@@ -209,7 +234,6 @@ function Labeling() {
         setTextData([]);
         setEntities([]);
         setRelations([]);
-        setControlPanelMessage(` Hint: Use 'Get next/prev to navigate'`);
     }
 
     // NER labelling UI
@@ -258,7 +282,6 @@ function Labeling() {
                   </select>
                   <button onClick={() => getNextHandler(-1)}>Get prev</button>
                   <button onClick={() => getNextHandler(1)}>Get next</button>
-                  <button onClick={getTypesHandler}>Get types</button>
                   <button onClick={() => changeStateHandler('approved')}>Approve</button>
                   <button onClick={() => changeStateHandler('flag')}>Flag</button>
                   <text>{controlPanelMessage}</text>
