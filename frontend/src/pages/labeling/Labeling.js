@@ -203,36 +203,69 @@ function Labeling() {
         setTextSelectionState({text: selectionText, start: entity_start_index, end: entity_end_inedx, valid: isValid});
     }
 
+    const filterChangeHandler = (event) => {
+        setNextOffset(-1);
+        setNextFetchFilter(event.target.value);
+        setTextData([]);
+        setEntities([]);
+        setRelations([]);
+        setControlPanelMessage(` Hint: Use 'Get next/prev to navigate'`);
+    }
+
     // NER labelling UI
+    const addEntityHandler = () => {
+        const new_entities = entities.concat({
+            id: uuidv4(),
+            text: textSelectionState.text,
+            type: selectedEntityType,
+            start: textSelectionState.start,
+            end: textSelectionState.end
+        });
+        new_entities.sort((a, b) => a.start - b.start);
+        setEntities(new_entities);
+    };
+    let onRelationTypeChangeHandler = (e) => {
+        setSelectedRelationType(e.target.value)
+    };
+    let onToEntityChangeHandler = (e) => {
+        const selected_entity = e.target.value ? entities.filter((entity) => entity.id === e.target.value)[0] : null;
+        setSelectedToEntity(selected_entity);
+    };
+    let onFromEntityChangeHandler = (e) => {
+        const selected_entity = e.target.value ? entities.filter((entity) => entity.id === e.target.value)[0] : null;
+        setSelectedFromEntity(selected_entity);
+    };
+    let addRelationHandler = () => {
+        setRelations(relations.concat({
+            id: uuidv4(),
+            head: selectedFromEntity,
+            type: selectedRelationType,
+            tail: selectedToEntity
+        }));
+    };
     return (
         <div>
             <div className='ControlPanel'>
                 <StackedProgressBar data={progress}/>
                 <textarea className='Sentence' value={textData.join(' ')} onSelect={textSelectionHandler}/>
                 <span style={{'marginLeft': '30%'}}>
-          <select name='Filter' id='filter' onChange={(event) => {
-              setNextOffset(-1);
-              setNextFetchFilter(event.target.value);
-              setTextData([]);
-              setEntities([]);
-              setRelations([]);
-              setControlPanelMessage(` Hint: Use 'Get next/prev to navigate'`);
-          }}>
-            <option value='all'>All</option>
-            <option value='pending'>Pending</option>
-            <option value='approved'>Approved</option>
-            <option value='flag'>Flag</option>
-            <option value='invalid'>Invalid</option>
-          </select>
-          
-          <button onClick={() => getNextHandler(-1)}>Get prev</button>
-          <button onClick={() => getNextHandler(1)}>Get next</button>
-          <button onClick={getTypesHandler}>Get types</button>
-          <button onClick={() => changeStateHandler('approved')}>Approve</button>
-          <button onClick={() => changeStateHandler('flag')}>Flag</button>
-          <text>{controlPanelMessage}</text>
-        </span>
+                  <select name='Filter' id='filter' onChange={filterChangeHandler}>
+                    <option value='all'>All</option>
+                    <option value='pending'>Pending</option>
+                    <option value='approved'>Approved</option>
+                    <option value='flag'>Flag</option>
+                    <option value='invalid'>Invalid</option>
+                  </select>
+                  <button onClick={() => getNextHandler(-1)}>Get prev</button>
+                  <button onClick={() => getNextHandler(1)}>Get next</button>
+                  <button onClick={getTypesHandler}>Get types</button>
+                  <button onClick={() => changeStateHandler('approved')}>Approve</button>
+                  <button onClick={() => changeStateHandler('flag')}>Flag</button>
+                  <text>{controlPanelMessage}</text>
+                </span>
+
                 <hr/>
+
                 <div className='ActionPanel'>
                     <p> Entity Types: </p>
                     <select name="Entity Types" id="entitytypes" onChange={(e) => {
@@ -244,56 +277,33 @@ function Labeling() {
                     <p>Text: {textSelectionState.text}</p>
                     <p>Start: {textSelectionState.start}</p>
                     <p>End: {textSelectionState.end}</p>
-                    <button disabled={!textSelectionState.valid || !selectedEntityType} onClick={() => {
-                        const new_entities = entities.concat({
-                            id: uuidv4(),
-                            text: textSelectionState.text,
-                            type: selectedEntityType,
-                            start: textSelectionState.start,
-                            end: textSelectionState.end
-                        });
-                        new_entities.sort((a, b) => a.start - b.start);
-                        setEntities(new_entities);
-                    }}>
-                        Add Entity
-                    </button>
+                    <button disabled={!textSelectionState.valid || !selectedEntityType} onClick={addEntityHandler}> Add Entity </button>
                 </div>
-                <hr/>
+
                 <div className='ActionPanel'>
-          <span> From Entity: <select name="Relation Types" id="entitytypes" onChange={(e) => {
-              const selected_entity = e.target.value ? entities.filter((entity) => entity.id === e.target.value)[0] : null;
-              setSelectedFromEntity(selected_entity);
-          }}>
-            <option>Select Entity</option>
-              {entities.map((entity) => <option
-                  value={entity.id}>{entity.text} ({entity.start}, {entity.end})</option>)}
-          </select></span>
-                    <span> Relation Type: <select name="Relation Types" id="entitytypes" onChange={(e) => {
-                        setSelectedRelationType(e.target.value)
-                    }}>
-            <option value={null}>Select Relation Type</option>
+                  <span> From Entity:
+                      <select name="Relation Types" onChange={onFromEntityChangeHandler}>
+                        <option>Select Entity</option>
+                        {entities.map((entity) => <option value={entity.id}>{entity.text} ({entity.start}, {entity.end})</option>)}
+                      </select>
+                  </span>
+                  <span> Relation Type:
+                      <select name="Relation Types" onChange={onRelationTypeChangeHandler}>
+                        <option value={null}>Select Relation Type</option>
                         {relationTypes.map((relationType) => <option value={relationType}> {relationType} </option>)}
-          </select></span>
-                    <span> To Entity: <select name="Relation Types" id="entitytypes" onChange={(e) => {
-                        const selected_entity = e.target.value ? entities.filter((entity) => entity.id === e.target.value)[0] : null;
-                        setSelectedToEntity(selected_entity);
-                    }}>
-            <option>Select Entity</option>
-                        {entities.map((entity) => <option
-                            value={entity.id}>{entity.text} ({entity.start}, {entity.end})</option>)}
-          </select></span>
-                    <button disabled={!(selectedFromEntity && selectedToEntity) || !selectedRelationType}
-                            onClick={() => {
-                                setRelations(relations.concat({
-                                    id: uuidv4(),
-                                    head: selectedFromEntity,
-                                    type: selectedRelationType,
-                                    tail: selectedToEntity
-                                }));
-                            }}>
-                        Add Relation
-                    </button>
+                      </select>
+                  </span>
+                  <span> To Entity:
+                      <select name="Relation Types" onChange={onToEntityChangeHandler}>
+                        <option>Select Entity</option>
+                        {entities.map((entity) => <option value={entity.id}>{entity.text} ({entity.start}, {entity.end})</option>)}
+                      </select>
+                  </span>
+                  <button disabled={!(selectedFromEntity && selectedToEntity) || !selectedRelationType} onClick={addRelationHandler}>
+                    Add Relation
+                  </button>
                 </div>
+
             </div>
             <div className='LabelsWrapper'>
                 <div className='Label'>
@@ -302,8 +312,7 @@ function Labeling() {
                         {entities.map((entity, index) =>
                             <li style={{width: '100%'}}>
                                 <p>
-                                    <CloseButton id={entity.id}
-                                                 onClick={handleRemoveEntity}/> {entity.text} ({entity.start}, {entity.end})
+                                    <CloseButton id={entity.id} onClick={handleRemoveEntity}/> {entity.text} ({entity.start}, {entity.end})
                                 </p>
                                 <select name='Entity Type' value={entity.type} onChange={(e) => {
                                     const new_entities = entities.map((entity, i) => {
@@ -377,6 +386,7 @@ function Labeling() {
                         )}
                     </ul>
                 </div>
+
                 <div className='Label'>
                     <h4>Relations</h4>
                     <ul className='LabelList'> {relations.map((relation, index) => <li pos={index}>
@@ -404,7 +414,9 @@ function Labeling() {
                     </li>)}
                     </ul>
                 </div>
+
             </div>
+
         </div>
     );
 }
