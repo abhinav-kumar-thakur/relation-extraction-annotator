@@ -3,7 +3,7 @@ import json
 
 from flask import Blueprint, Response, request, jsonify
 
-from db.data import upload_raw_data as upload_raw_data_db
+from db.data import upload_data as upload_raw_data_db
 from db.data import get_next_raw_data as get_next_raw_data_db
 from db.data import update_raw_data, get_all_approved_raw_data, get_all_data
 from db.data import get_progress_db

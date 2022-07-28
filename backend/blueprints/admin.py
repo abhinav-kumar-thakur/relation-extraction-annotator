@@ -2,10 +2,7 @@ import json
 
 from flask import Blueprint, request, jsonify
 
-from db.admin import get_ner_types, upsert_configs, get_configs
-
-LABELS_KEY = 'labels'
-RULES_KEY = 'rules'
+from db.admin import upsert_configs, get_configs, RULES_KEY, LABELS_KEY
 
 admin_bp = Blueprint('ner', __name__)
 

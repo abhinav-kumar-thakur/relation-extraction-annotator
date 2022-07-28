@@ -3,11 +3,26 @@ from typing import Dict
 from bson import ObjectId
 
 from db.db import db
+from db.admin import get_configs, RULES_KEY
+from models.rule import Rules
 
 
-# Upload raw data to db
-def upload_raw_data(raw_data: Dict):
+def upload_data(raw_data: Dict):
+    rules_config = get_configs(RULES_KEY)
+    rules = Rules(rules_config)
+
     for data in raw_data:
+        data_valid = True
+        entities = data['entities']
+        for relation in data['relations']:
+            head_type, tail_type = entities[relation['head']]['type'], entities[relation['tail']]['type']
+            if not rules.is_valid_triple(head_type, tail_type, relation['type']):
+                data_valid = False
+                relation['invalid'] = True
+
+        if not data_valid:
+            data['status'] = 'invalid'
+
         if 'status' not in data:
             data['status'] = 'pending'
 
@@ -30,9 +45,9 @@ def get_next_raw_data(state: str, offset: int):
     if not data:
         return None
 
-    next = data[0]
-    next['_id'] = str(next['_id'])
-    return next
+    data = data[0]
+    data['_id'] = str(data['_id'])
+    return data
 
 
 # Update raw data in db

@@ -108,7 +108,8 @@ function Labeling() {
                             head: r_entities[relation['head']],
                             tail: r_entities[relation['tail']],
                             type: relation['type'],
-                            score: relation['score'] ? relation['score'] : null
+                            score: relation['score'] ? relation['score'] : null,
+                            invalid: relation['invalid']
                         }
                     });
 
@@ -221,6 +222,7 @@ function Labeling() {
             <option value='pending'>Pending</option>
             <option value='approved'>Approved</option>
             <option value='flag'>Flag</option>
+            <option value='invalid'>Invalid</option>
           </select>
           
           <button onClick={() => getNextHandler(-1)}>Get prev</button>
@@ -397,7 +399,7 @@ function Labeling() {
                                 }}>
                             {relationTypes.map((relationType) => <option value={relationType}>{relationType}</option>)}
                         </select>
-                        {' ' + relation.tail.text} ({relation.tail.start})
+                        {' ' + relation.tail.text} ({relation.tail.start}) {relation.invalid ? '*' : ''}
                         <p>{relation.score ? JSON.stringify(relation.score) : ''}</p>
                     </li>)}
                     </ul>
