@@ -7,8 +7,10 @@ dependencies = []
 
 
 def upgrade(db: Database):
-    db.create_collection('ner_types')
+    db.create_collection('admin')
+    db.create_collection('data')
 
 
 def downgrade(db: Database):
-    db.drop_collection('ner_types')
+    db.drop_collection('admin')
+    db.drop_collection('data')
