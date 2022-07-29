@@ -63,7 +63,7 @@ def download_approved_data():
     )
 
 
-@data_bp.route('/all/download', methods=['GET'])
+@data_bp.route('/download', methods=['GET'])
 def download_all_data():
     data = get_all_data()
 
