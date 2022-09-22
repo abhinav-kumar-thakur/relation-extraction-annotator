@@ -8,6 +8,9 @@ Web framework for end to end machine learning. Currently only NER data labeling 
 
 Application will become available on [http://localhost:11001/](http://localhost:11001/).
 
+## To download sample NER files
+Run `sh ./scripts/download_data.sh` which should download Relation extraction datasets in sample_files directory datasets 
+
 ## Local development:
 * Use containerized mongo db: `docker-compose -f docker-compose.dev.yml up --build -d database`
 * [Setting up backend locally](./backend/README.md)
