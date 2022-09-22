@@ -8,7 +8,7 @@ Web framework for end to end machine learning. Currently only NER data labeling 
 
 Application will become available on [http://localhost:11001/](http://localhost:11001/).
 
-## Setting up tool with the sameple files
+## Setting up tool with the sample files
 * To download sample data run: `sh ./scripts/download_data.sh` which should download Relation extraction datasets in sample_files directory
 * On the Upload tab of Admin page upload:
     - Types file: `sample_files/datasets/conll04/conll04_types.json`

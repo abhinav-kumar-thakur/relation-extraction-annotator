@@ -1,0 +1,4 @@
+{
+    "default": {"head": "*", "tail": "*", "relations":"*"},
+    "rules": []
+}
