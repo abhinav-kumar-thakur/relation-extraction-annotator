@@ -55,7 +55,9 @@ function Labeling() {
     //  Validate Relation
     const isInValidRelation = () => {
         const all_present = selectedFromEntity && selectedToEntity && selectedRelationType
-        if (all_present) {
+
+        // TODO: Check if default_relations are necessary for current requirements
+        if (all_present && rules.size > 1) {
             const rule_key = `${selectedFromEntity.type}_${selectedToEntity.type}`
             const valid_relations = rules.has(rule_key) ? rules.get(rule_key) : rules.get('default');
             return !valid_relations.includes(selectedRelationType);
