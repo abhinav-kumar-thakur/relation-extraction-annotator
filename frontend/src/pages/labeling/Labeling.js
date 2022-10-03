@@ -3,6 +3,7 @@ import './Labeling.css';
 import {v4 as uuidv4} from 'uuid';
 import React, {useState, useEffect} from 'react';
 import StackedProgressBar from '../../components/progressbar/progessBar';
+import Timer from '../../components/timer/timer';
 import CloseButton from 'react-bootstrap/CloseButton';
 import {DataUpdateURL, GetDataURL, GetTypesURL, LabelingProgressURL, RulesURL} from "../../configs/urls";
 
@@ -102,7 +103,7 @@ function Labeling() {
                 for (const rule of result.rules) {
                     rulesMap.set(`${rule.head}_${rule.tail}`, rule.relations)
                 }
-                
+
                 setRules(rulesMap);
             })
             .catch((error) => {
@@ -291,7 +292,8 @@ function Labeling() {
             <div className='ControlPanel'>
                 <StackedProgressBar data={progress}/>
                 <textarea className='Sentence' value={textData.join(' ')} onSelect={textSelectionHandler}/>
-                <span style={{'marginLeft': '30%'}}>
+                <span style={{'marginLeft': '35%'}}>
+                    {/* TODO: Make above margin dynamic */}
                   <select name='Filter' id='filter' onChange={filterChangeHandler}>
                     <option value='all'>All</option>
                     <option value='pending'>Pending</option>
@@ -299,13 +301,15 @@ function Labeling() {
                     <option value='flag'>Flag</option>
                     <option value='invalid'>Invalid</option>
                   </select>
-                  <button onClick={() => getNextHandler(-1)}>Get prev</button>
+                  <button onClick={() => {
+                    getNextHandler(-1)
+                  }}>Get prev</button>
                   <button onClick={() => getNextHandler(1)}>Get next</button>
                   <button onClick={() => changeStateHandler('approved')}>Approve</button>
                   <button onClick={() => changeStateHandler('flag')}>Flag</button>
                   <text>{controlPanelMessage}</text>
                 </span>
-
+                <Timer/>
                 <hr/>
 
                 <div className='ActionPanel'>
@@ -322,7 +326,7 @@ function Labeling() {
                     <button disabled={!textSelectionState.valid || !selectedEntityType} onClick={addEntityHandler}> Add Entity </button>
                 </div>
 
-                <div className='ActionPanel'>
+                <div className='ActionPanel' style={{'marginBottom': '1%'}}>
                   <span> From Entity:
                       <select name="Relation Types" onChange={onFromEntityChangeHandler}>
                         <option>Select Entity</option>
