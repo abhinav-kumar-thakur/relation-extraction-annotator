@@ -325,19 +325,19 @@ function Labeling() {
         });
         setRelations(
             sortedRelations.sort((relation1, relation2) => {
-                if (relation1.head.start == relation2.head.start) return relation1.tail.start > relation2.tail.start ? 1 : -1;
+                if (relation1.head.start === relation2.head.start) return relation1.tail.start > relation2.tail.start ? 1 : -1;
                 return relation1.head.start > relation2.head.start ? 1 : -1;
             })
         );
     };
     // To check if duplicate entities are being added.
     let checkIfDuplicateEntityExists = (entity, newEntity) => {
-        if (entity.start == newEntity.start && entity.end == newEntity.end) return true;
+        if (entity.start === newEntity.start && entity.end === newEntity.end) return true;
         return false;
     };
     // To check if duplicate relation types are added are being added between same entities.
     let checkIfDuplicateRelationTypeExists = (relationType, newRelationType) => {
-        if (relationType == newRelationType) return true;
+        if (relationType === newRelationType) return true;
         return false;
     };
     //prettier-ignore

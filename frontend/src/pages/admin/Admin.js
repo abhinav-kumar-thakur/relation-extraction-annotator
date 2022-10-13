@@ -9,7 +9,7 @@ import {
     RulesFileUploadURL
 } from "../../configs/urls"
 
-export function Admin() {
+export default function Admin() {
     return (<Tabs
         defaultActiveKey="uploads"
         id="uncontrolled-tab-example"
