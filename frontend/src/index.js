@@ -1,17 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import './index.css';
-import Labeling from './pages/labeling/Labeling';
+
 import reportWebVitals from './reportWebVitals';
-import {Admin} from "./pages/admin/Admin";
+
 
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import {Home} from "./pages/learninge2e/LearningE2E";
+
+import Home from "./pages/learninge2e/LearningE2E";
+import Labeling from './pages/labeling/Labeling';
+import Admin from "./pages/admin/Admin";
+import MultiModal from "./pages/multiModal/multiModal";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -22,14 +26,16 @@ root.render(
                     <Navbar.Brand href="/">Learning-e2e</Navbar.Brand>
                     <Nav className="me-auto">
                         <Nav.Link href="admin">Admin</Nav.Link>
-                        <Nav.Link href="labeling">Labeling</Nav.Link>
+                        <Nav.Link href="re">Relation Extraction</Nav.Link>
+                        <Nav.Link href="multi-modal">Multi Modal</Nav.Link>
                     </Nav>
                 </Container>
             </Navbar>
             <Routes>
-                <Route path="/" element={<Home/>}></Route>
-                <Route path="/labeling" element={<Labeling/>}></Route>
-                <Route path="/admin" element={<Admin/>}></Route>
+                <Route path="/" element={<Home />}></Route>
+                <Route path="/re" element={<Labeling />}></Route>
+                <Route path="/admin" element={<Admin />}></Route>
+                <Route path='/multi-modal' element={<MultiModal />} ></Route>
             </Routes>
         </BrowserRouter>
     </React.StrictMode>
