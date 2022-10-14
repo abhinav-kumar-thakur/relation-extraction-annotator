@@ -3,8 +3,8 @@
 }
 
 .ControlPanel {
-  height: 36vh;
   background-color: deepskyblue;
+  align-items: center;
 }
 
 .Sentence {
@@ -42,4 +42,10 @@
   height: 51vh;
 }
 
+.TimerCard {
+  text-align: center;
+}
 
+.TimerButton {
+  align-items: center;
+}

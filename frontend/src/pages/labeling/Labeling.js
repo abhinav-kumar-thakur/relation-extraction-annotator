@@ -3,6 +3,7 @@ import './Labeling.css';
 import { v4 as uuidv4 } from 'uuid';
 import React, { useState, useEffect } from 'react';
 import StackedProgressBar from '../../components/progressbar/progessBar';
+import Timer from '../../components/timer/timer';
 import CloseButton from 'react-bootstrap/CloseButton';
 import { DataUpdateURL, GetDataURL, GetTypesURL, LabelingProgressURL, RulesURL } from '../../configs/urls';
 
@@ -344,25 +345,27 @@ function Labeling() {
     return (
         <div>
             <div className='ControlPanel'>
-                <StackedProgressBar data={progress} />
-                <textarea className='Sentence' value={textData.join(' ')} onSelect={textSelectionHandler} />
-                <span style={{ marginLeft: '30%' }}>
-                    <select name='Filter' id='filter' onChange={filterChangeHandler}>
-                        <option value='all'>All</option>
-                        <option value='pending'>Pending</option>
-                        <option value='approved'>Approved</option>
-                        <option value='flag'>Flag</option>
-                        <option value='invalid'>Invalid</option>
-                    </select>
-                    <button onClick={() => getNextHandler(-1)}>Get prev</button>
-                    <button onClick={() => getNextHandler(1)}>Get next</button>
-                    <button onClick={() => changeStateHandler('approved')}>Approve</button>
-                    <button onClick={() => changeStateHandler('flag')}>Flag</button>
-                    <text>{controlPanelMessage}</text>
+                <StackedProgressBar data={progress}/>
+                <textarea className='Sentence' value={textData.join(' ')} onSelect={textSelectionHandler}/>
+                <span style={{'marginLeft': '35%'}}>
+                    {/* TODO: Make above margin dynamic */}
+                  <select name='Filter' id='filter' onChange={filterChangeHandler}>
+                    <option value='all'>All</option>
+                    <option value='pending'>Pending</option>
+                    <option value='approved'>Approved</option>
+                    <option value='flag'>Flag</option>
+                    <option value='invalid'>Invalid</option>
+                  </select>
+                  <button onClick={() => {
+                    getNextHandler(-1)
+                  }}>Get prev</button>
+                  <button onClick={() => getNextHandler(1)}>Get next</button>
+                  <button onClick={() => changeStateHandler('approved')}>Approve</button>
+                  <button onClick={() => changeStateHandler('flag')}>Flag</button>
+                  <text>{controlPanelMessage}</text>
                 </span>
-
-                <hr />
-
+                <Timer/>
+                <hr/>
                 <div className='ActionPanel'>
                     <p> Entity Types: </p>
                     <select
@@ -384,7 +387,6 @@ function Labeling() {
                         Add Entity
                     </button>
                 </div>
-
                 <div className='ActionPanel'>
                     <span>
                         From Entity:
