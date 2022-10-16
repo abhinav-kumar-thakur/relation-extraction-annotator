@@ -3,6 +3,7 @@ import './Labeling.css';
 import { v4 as uuidv4 } from 'uuid';
 import React, { useState, useEffect } from 'react';
 import StackedProgressBar from '../../components/progressbar/progessBar';
+import Timer from '../../components/timer/timer';
 import CloseButton from 'react-bootstrap/CloseButton';
 import { DataUpdateURL, GetDataURL, GetTypesURL, LabelingProgressURL, RulesURL } from '../../configs/urls';
 
@@ -10,6 +11,10 @@ function Labeling() {
     // Progress bar
     const [progress, setProgress] = useState(null);
 
+    // Timer state
+    const [timer, setTimer] = useState(0);
+    const [isTimerActive, setIsTimerActive] = useState(false);
+    
     // Fetch next
     const [nextFetchFilter, setNextFetchFilter] = useState('all');
     const [nextOffset, setNextOffset] = useState(-1);
@@ -165,7 +170,9 @@ function Labeling() {
                             invalid: relation['invalid'],
                         };
                     });
-
+                    
+                    setTimer(result['duration'] ? result['duration'] : 0);
+                    setIsTimerActive(result['duration'] ? false : true);
                     setSampleID(result['_id']);
                     setTextData(r_tokens);
                     setEntities(r_entities);
@@ -194,6 +201,7 @@ function Labeling() {
     };
 
     const changeStateHandler = state => {
+        setIsTimerActive(false);
         const request_relations = relations.map(relation => {
             return {
                 head: entities.findIndex(entity => entity.id === relation.head.id),
@@ -206,6 +214,7 @@ function Labeling() {
             _id: sampleID,
             entities: entities,
             relations: request_relations,
+            duration: timer,
         };
 
         fetch(`${DataUpdateURL}/${state}`, {
@@ -358,6 +367,7 @@ function Labeling() {
                     <button onClick={() => getNextHandler(1)}>Get next</button>
                     <button onClick={() => changeStateHandler('approved')}>Approve</button>
                     <button onClick={() => changeStateHandler('flag')}>Flag</button>
+                    <Timer timer={timer} setTimerFunc={setTimer} isActive={isTimerActive} setIsActiveFunc={setIsTimerActive}/>
                     <text>{controlPanelMessage}</text>
                 </span>
 

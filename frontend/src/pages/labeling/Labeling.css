@@ -3,8 +3,8 @@
 }
 
 .ControlPanel {
-  height: 36vh;
   background-color: deepskyblue;
+  align-items: center;
 }
 
 .Sentence {
@@ -41,5 +41,3 @@
   overflow-y: scroll;
   height: 51vh;
 }
-
-
