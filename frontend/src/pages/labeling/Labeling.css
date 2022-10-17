@@ -3,8 +3,8 @@
 }
 
 .ControlPanel {
-  height: 36vh;
   background-color: deepskyblue;
+  align-items: center;
 }
 
 .Sentence {
@@ -42,7 +42,6 @@
   height: 51vh;
 }
 
-
 [data-tooltip]{
   position: relative;
   display: inline-block;
@@ -69,4 +68,3 @@
   position: absolute;
   transform: translate(-80%, -0.1rem);
 }
-

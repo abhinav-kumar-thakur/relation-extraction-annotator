@@ -40,7 +40,8 @@ def update_state(state):
     updates = {
         'status': state,
         'entities': data['entities'],
-        'relations': data['relations']
+        'relations': data['relations'],
+        'duration': data['duration']
     }
 
     if not update_raw_data(_id, updates):
