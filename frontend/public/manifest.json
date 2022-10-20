@@ -1,6 +1,6 @@
 {
-  "short_name": "NER Labelling tool",
-  "name": "NER Labelling tool",
+  "short_name": "Le2e",
+  "name": "Learning-e2e",
   "icons": [],
   "start_url": ".",
   "display": "standalone",
