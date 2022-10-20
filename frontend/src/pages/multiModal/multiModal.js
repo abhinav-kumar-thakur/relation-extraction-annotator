@@ -24,7 +24,7 @@ export default function MultiModal() {
             <Row>
                 <button onClick={() => setShowLabels(!showLabels)}> {showLabels ? 'Hide Labels' : 'Show Labels'} </button>
             </Row>
-            <Row style={{ border: "1px solid blue" }} xs='auto'>
+            <Row style={{ border: "5px solid black", backgroundColor: `${imageInfo.labels ? "red": "green"}`}} xs='auto'>
                 <Col>
                     <Row>
                         <Col>
@@ -52,7 +52,12 @@ export default function MultiModal() {
                                 <Image className='Original-Image' src={`${BackendMultiModalURL}/objects/${obj.filename}`} />
                             </Row>
                             <Row>
-                                confidence: {obj.confidence.toFixed(2)}
+                                <Col>
+                                    confidence: {obj.confidence.toFixed(2)}
+                                </Col>
+                                <Col>
+                                    label: {obj.label}
+                                </Col>
                             </Row>
                         </Col>
                     })
@@ -63,7 +68,7 @@ export default function MultiModal() {
             </Row>
             {
                 imageInfo.similarities.map(similarImage => {
-                    return <Row style={{ border: "1px solid yellow" }} xs='auto'>
+                    return <Row style={{ border: "5px solid blue", backgroundColor: `${similarImage.labels ? "red": "green"}` }} xs='auto'>
                         <Col>
                             <Row>
                                 <Image className='Original-Image' src={`${BackendMultiModalURL}/image/${similarImage.image}`} />
@@ -86,7 +91,12 @@ export default function MultiModal() {
                                         <Image className='Original-Image' src={`${BackendMultiModalURL}/objects/${obj.filename}`} />
                                     </Row>
                                     <Row>
-                                        confidence: {obj.confidence.toFixed(2)}
+                                        <Col>
+                                            confidence: {obj.confidence.toFixed(2)}
+                                        </Col>
+                                        <Col>
+                                            label: {obj.label}
+                                        </Col>
                                     </Row>
                                 </Col>
                             })}
