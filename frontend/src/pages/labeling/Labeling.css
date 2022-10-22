@@ -41,3 +41,30 @@
   overflow-y: scroll;
   height: 51vh;
 }
+
+[data-tooltip]{
+  position: relative;
+  display: inline-block;
+}
+
+[data-tooltip]:hover::before{
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  background: #000;
+  color: #FFF;
+  padding: .2rem .4rem;
+  border-radius: .3rem;
+  width: max-content;
+  font-size: 14px;
+  text-align: center;
+}
+
+[data-tooltip]:hover::after {
+  border: .5rem solid transparent;
+  border-top-color: #000;
+  content: '';
+  position: absolute;
+  transform: translate(-80%, -0.1rem);
+}

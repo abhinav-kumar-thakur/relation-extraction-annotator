@@ -48,6 +48,9 @@ function Labeling() {
     const [selectedFromEntity, setSelectedFromEntity] = useState(null);
     const [selectedToEntity, setSelectedToEntity] = useState(null);
 
+    const [selectedFilterLabel, setSelectedFilterLabel] = useState('entities');
+    const [appliedLabelFilters, setLabelFilters] = useState([]);
+
     // control Panel Message
     const [controlPanelMessage, setControlPanelMessage] = useState('');
 
@@ -73,6 +76,20 @@ function Labeling() {
             return !valid_relations.includes(selectedRelationType);
         }
         return !all_present;
+    };
+
+    const handleLabelFilterChange = e => {
+        setSelectedFilterLabel(e.target.value);
+    };
+
+    const getAppliedLabelFilters = e => {
+        const options = Array.from(e.target.options);
+        const appliedFilters = [];
+        options.forEach(option => {
+            if (option.selected) appliedFilters.push(option.value);
+        });
+        setLabelFilters(appliedFilters);
+        console.log(selectedFilterLabel, appliedFilters);
     };
 
     // Handlers
@@ -136,8 +153,17 @@ function Labeling() {
         const fetch_offset = nextOffset + offset_update;
         updateProgress();
 
-        fetch(`${GetDataURL}/${nextFetchFilter}/${fetch_offset}`, {
-            method: 'GET',
+        fetch(`${GetDataURL}/filterData`, {
+            method: 'POST',
+            body: JSON.stringify({
+                state: nextFetchFilter,
+                offset: fetch_offset,
+                labelType: selectedFilterLabel,
+                labelValues: appliedLabelFilters,
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+            },
         })
             .then(response => {
                 if (response.status === 200) {
@@ -198,6 +224,21 @@ function Labeling() {
             .catch(error => {
                 console.error('Error:', error);
             });
+    };
+
+    const clearFilters = () => {
+        if (appliedLabelFilters.length === 0 && nextFetchFilter === 'all') return;
+
+        // clearing the selected values
+        const filters = Array.from(document.getElementById('label-filter').options);
+        filters.forEach(filter => {
+            filter.selected = false;
+        });
+        setNextOffset(0);
+        setNextFetchFilter('all');
+        setSelectedFilterLabel('entities');
+        setLabelFilters([]);
+        getNextHandler(1);
     };
 
     const changeStateHandler = state => {
@@ -355,7 +396,26 @@ function Labeling() {
             <div className='ControlPanel'>
                 <StackedProgressBar data={progress} />
                 <textarea className='Sentence' value={textData.join(' ')} onSelect={textSelectionHandler} />
-                <span style={{ marginLeft: '30%' }}>
+                <p data-tooltip="Clear Filters" role="button" style={{marginLeft: '30%'}} onClick={clearFilters}> &#x2715; </p>
+                <span style={{marginLeft: '2%', width: '7%'}}>
+                <select style={{ width: '7%'}} value={selectedFilterLabel} onChange = {handleLabelFilterChange}>
+                    <option value='entities'> Entity </option>
+                    <option value='relations'> Relation </option>
+                </select>
+            </span>
+            <span style={{marginLeft: '2%'}} >
+                <select style={{ width: '8%'}} name='LabelFilter' id='label-filter' multiple onChange={getAppliedLabelFilters}>
+                {
+                    selectedFilterLabel === 'relations' ?
+                        relationTypes.map(relationType => (
+                            <option value={relationType}> {relationType} </option>
+                    )) : entityTypes.map(entityType => (
+                            <option value={entityType}>{entityType}</option>
+                    ))
+                }  
+                </select>
+            </span>
+                <span style={{ marginLeft: '2%'}}>
                     <select name='Filter' id='filter' onChange={filterChangeHandler}>
                         <option value='all'>All</option>
                         <option value='pending'>Pending</option>
@@ -370,6 +430,7 @@ function Labeling() {
                     <Timer timer={timer} setTimerFunc={setTimer} isActive={isTimerActive} setIsActiveFunc={setIsTimerActive}/>
                     <text>{controlPanelMessage}</text>
                 </span>
+               
 
                 <hr />
 

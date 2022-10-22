@@ -1,3 +1,4 @@
+from html import entities
 from typing import Dict
 
 from bson import ObjectId
@@ -30,16 +31,25 @@ def upload_data(raw_data: Dict):
     db.data.insert_many(raw_data)
 
 
-# Get next raw data from db
-def get_next_raw_data(state: str, offset: int):
+def get_next_raw_data(query):
     """
     Returns the next raw data from the database.
     """
-
-    if state == 'all':
-        data = db.data.find().sort('_id').skip(offset).limit(1);
+    labelFilterLen = len(query['labelValues'])
+    if query['state'] == 'all' and  labelFilterLen == 0:
+        data = db.data.find().sort('_id').skip(query['offset']).limit(1);
+    elif labelFilterLen > 0 and query['state'] == "all":
+        if query['labelType'] == 'entities':
+            data = db.data.find({'entities.type': {'$in': query['labelValues']}}).sort('_id').skip(query['offset']).limit(1);
+        elif query['labelType'] == 'relations':
+            data = db.data.find({'relations.type': {'$in': query['labelValues']}}).sort('_id').skip(query['offset']).limit(1);
+    elif labelFilterLen > 0 and query['state'] != "all":
+        if query['labelType'] == 'entities':
+            data = db.data.find({'status': query['state'], 'entities.type': {'$in': query['labelValues']}}).sort('_id').skip(query['offset']).limit(1);
+        elif query['labelType'] == 'relations':
+            data = db.data.find({'status': query['state'], 'relations.type': {'$in': query['labelValues']}}).sort('_id').skip(query['offset']).limit(1);
     else:
-        data = db.data.find({'status': state}).sort('_id').skip(offset).limit(1);
+        data = db.data.find({'status': query['state']}).sort('_id').skip(query['offset']).limit(1);
 
     data = list(data)
     if not data:

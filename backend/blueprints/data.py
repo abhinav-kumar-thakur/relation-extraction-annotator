@@ -22,16 +22,15 @@ def upload_raw_data():
     upload_raw_data_db(raw_data)
     return jsonify({'status': 'success'})
 
-
-@data_bp.route('/data/<string:state>/<int:offset>', methods=['GET'])
-def get_next_raw_data(state: str, offset: int):
-    data = jsonify(get_next_raw_data_db(state, offset))
+@data_bp.route('/data/filterData', methods=['POST'])
+def get_next_raw_data():
+    query = request.get_json()
+    data = jsonify(get_next_raw_data_db(query))
 
     if not data:
         return '', http.HTTPStatus.NO_CONTENT
 
     return data, http.HTTPStatus.OK
-
 
 @data_bp.route('/update/state/<string:state>', methods=['POST'])
 def update_state(state):
