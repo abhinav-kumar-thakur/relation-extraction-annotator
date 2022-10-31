@@ -94,7 +94,9 @@ function Labeling() {
         fetch(GetTypesURL, { method: 'GET' })
             .then(response => response.json())
             .then(result => {
-                setEntityTypes(result['entities']);
+                result['entities'].sort();
+                result['relations'].sort();
+                setEntityTypes((result['entities']));
                 setRelationTypes(result['relations']);
             })
             .catch(error => {
