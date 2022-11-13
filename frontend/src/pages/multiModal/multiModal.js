@@ -3,9 +3,43 @@ import { Container, Row, Col, Image } from "react-bootstrap";
 import { BackendMultiModalURL } from '../../configs/urls';
 import './multiModal.css'
 
+function PredictionTable(props) {
+    const predictions = props.predictions;
+    if (predictions === undefined) {
+        return null;
+    }
+
+    return (
+        <Row fluid>
+            {
+                Object.keys(predictions).map(key => {
+                    return (
+                        <Col>
+                            <Row style={{ border: "1px solid black", backgroundColor: "orange" }} xs='auto'>
+                                {key}
+                            </Row>
+                            {
+                                Object.keys(predictions[key]).map(t => {
+                                    return (
+                                        <Row style={{ border: "1px solid black", backgroundColor: `${predictions[key][t] > 0.5 ? "#C3908F" : "#AFE1AF"}` }} xs='auto'>
+                                            {t}: {predictions[key][t].toFixed(3)}
+                                        </Row>
+                                    )
+                                })
+                            }
+                        </Col>
+                    );
+                })
+            }
+        </Row>
+    );
+};
+
 export default function MultiModal() {
     const [imageInfo, setImageInfo] = useState(null);
-    const [showLabels, setShowLabels] = useState(false);
+    const [showLabels, setShowLabels] = useState(true);
+    const [showDetectedObjects, setShowDetectedObjects] = useState(false);
+    const [showSimilar, setshowSimilar] = useState(false);
 
     useEffect(() => {
         fetch(`${BackendMultiModalURL}/info/random`, { method: 'GET' })
@@ -21,10 +55,19 @@ export default function MultiModal() {
 
     return (
         <Container fluid>
-            <Row>
+            <span>
                 <button onClick={() => setShowLabels(!showLabels)}> {showLabels ? 'Hide Labels' : 'Show Labels'} </button>
-            </Row>
-            <Row style={{ border: "5px solid black", backgroundColor: `${imageInfo.labels ? "red": "green"}`}} xs='auto'>
+                <button onClick={() => setShowDetectedObjects(!showDetectedObjects)}> {showDetectedObjects ? 'Hide Detected Objects' : 'Show Detected Objects'} </button>
+                <button onClick={() => setshowSimilar(!showSimilar)}> {showSimilar ? 'Hide Similars' : 'Show Similars'} </button>
+            </span>
+            {
+                showLabels ? <Row>
+                    <PredictionTable predictions={imageInfo.predictions} />
+                </Row> : null
+
+            }
+
+            <Row style={{ border: "5px solid black", backgroundColor: `${imageInfo.labels ? "#C3908F" : "#AFE1AF"}` }} xs='auto'>
                 <Col>
                     <Row>
                         <Col>
@@ -46,7 +89,8 @@ export default function MultiModal() {
                     </Row>
                 </Col>
                 {
-                    imageInfo.objects.map(obj => {
+
+                    showDetectedObjects ? imageInfo.objects.map(obj => {
                         return <Col>
                             <Row>
                                 <Image className='Original-Image' src={`${BackendMultiModalURL}/objects/${obj.filename}`} />
@@ -60,15 +104,15 @@ export default function MultiModal() {
                                 </Col>
                             </Row>
                         </Col>
-                    })
+                    }) : null
                 }
             </Row>
             <Row fluid>
-                <h3>Similar Memes</h3>
+                <h3>Similar Memes: {showSimilar ? "" : "Hidden"}</h3>
             </Row>
             {
-                imageInfo.similarities.map(similarImage => {
-                    return <Row style={{ border: "5px solid blue", backgroundColor: `${similarImage.labels ? "red": "green"}` }} xs='auto'>
+                showSimilar ? imageInfo.similarities.map(similarImage => {
+                    return <Row style={{ border: "5px solid blue", backgroundColor: `${similarImage.labels ? "#C3908F" : "#AFE1AF"}` }} xs='auto'>
                         <Col>
                             <Row>
                                 <Image className='Original-Image' src={`${BackendMultiModalURL}/image/${similarImage.image}`} />
@@ -85,7 +129,7 @@ export default function MultiModal() {
                             </Col> : null
                         }
                         {
-                            similarImage.objects.map(obj => {
+                            showDetectedObjects ? similarImage.objects.map(obj => {
                                 return <Col>
                                     <Row>
                                         <Image className='Original-Image' src={`${BackendMultiModalURL}/objects/${obj.filename}`} />
@@ -99,12 +143,13 @@ export default function MultiModal() {
                                         </Col>
                                     </Row>
                                 </Col>
-                            })}
+                            }) : null
+                        }
                     </Row>
-                })
+                }) : null
             }
-            <Row><p><b>Meme Category:</b> Funny</p> </Row>
-            <Row><p><b>Text Entities:</b> Meme, I </p></Row>
+            {/* <Row><p><b>Meme Category:</b> In Development</p> </Row>
+            <Row><p><b>Text Entities:</b> Meme, I </p></Row> */}
         </Container>
     );
 }
