@@ -21,6 +21,7 @@ services:
     working_dir: /backend
     environment:
       - MONGO_URI=mongodb://root:example@database:27017/learning_e2e?authSource=admin&readPreference=primary&ssl=false
+      - MODULES=re
     ports:
       - "11000:11000"
     command: sh run.sh
