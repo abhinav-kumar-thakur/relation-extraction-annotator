@@ -285,14 +285,14 @@ function Labeling() {
         setRelations([]);
     };
 
-    document.addEventListener("contextmenu", (event) => {
+    const textAreaContextMenuHandler = event => {
         event.preventDefault();
         if (!textSelectionState.valid || !selectedEntityType) {
             return;
         }
 
         addEntityHandler();
-    });
+    };
 
     // NER labelling UI
     const addEntityHandler = () => {
@@ -365,7 +365,7 @@ function Labeling() {
         <div>
             <div className='ControlPanel'>
                 <StackedProgressBar data={progress} />
-                <textarea className='Sentence' value={textData.join(' ')} onSelect={textSelectionHandler} />
+                <textarea className='Sentence' value={textData.join(' ')} onSelect={textSelectionHandler} onContextMenu={textAreaContextMenuHandler} />
                 <span style={{ marginLeft: '30%' }}>
                     <select name='Filter' id='filter' onChange={filterChangeHandler}>
                         <option value='all'>All</option>
