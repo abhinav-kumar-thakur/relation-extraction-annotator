@@ -285,6 +285,15 @@ function Labeling() {
         setRelations([]);
     };
 
+    document.addEventListener("contextmenu", (event) => {
+        event.preventDefault();
+        if (!textSelectionState.valid || !selectedEntityType) {
+            return;
+        }
+
+        addEntityHandler();
+    });
+
     // NER labelling UI
     const addEntityHandler = () => {
         let newEntity = {
