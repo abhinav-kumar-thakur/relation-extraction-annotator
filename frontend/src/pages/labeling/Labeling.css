@@ -23,6 +23,7 @@
   justify-content: space-around;
   align-items: center;
   width: 100%;
+  height: 4vh;
 }
 
 .LabelsWrapper {
@@ -39,5 +40,5 @@
 
 .LabelList {
   overflow-y: scroll;
-  height: 51vh;
+  height: 65vh;
 }

@@ -365,7 +365,6 @@ function Labeling() {
         <div>
             <div className='ControlPanel'>
                 <StackedProgressBar data={progress} />
-                <textarea className='Sentence' value={textData.join(' ')} onSelect={textSelectionHandler} onContextMenu={textAreaContextMenuHandler} />
                 <span style={{ marginLeft: '30%' }}>
                     <select name='Filter' id='filter' onChange={filterChangeHandler}>
                         <option value='all'>All</option>
@@ -380,36 +379,31 @@ function Labeling() {
                     <button onClick={() => changeStateHandler('flag')}>Flag</button>
                     <Timer timer={timer} setTimerFunc={setTimer} isActive={isTimerActive} setIsActiveFunc={setIsTimerActive}/>
                     <text>{controlPanelMessage}</text>
-                </span>
-
-                <hr />
-
+                </span> 
+                <textarea className='Sentence' value={textData.join(' ')} onSelect={textSelectionHandler} onContextMenu={textAreaContextMenuHandler} />
                 <div className='ActionPanel'>
-                    <p> Entity Types: </p>
-                    <select
-                        name='Entity Types'
-                        id='entitytypes'
-                        onChange={e => {
-                            setSelectedEntityType(e.target.value);
-                        }}
-                    >
-                        <option value={null}>Select Entity Type</option>
-                        {entityTypes.map(entityType => (
-                            <option value={entityType}>{entityType}</option>
-                        ))}
-                    </select>
-                    <p>Text: {textSelectionState.text}</p>
-                    <p>Start: {textSelectionState.start}</p>
-                    <p>End: {textSelectionState.end}</p>
-                    <button disabled={!textSelectionState.valid || !selectedEntityType} onClick={addEntityHandler}>
-                        Add Entity
-                    </button>
-                </div>
+                    <p> Entity Types:
+                        <select
+                            style={{ width: '11vw' }}
+                            name='Entity Types'
+                            id='entitytypes'
+                            onChange={e => {
+                                setSelectedEntityType(e.target.value);
+                            }}
+                        >
+                            <option value={null}>Select Entity Type</option>
+                            {entityTypes.map(entityType => (
+                                <option value={entityType}>{entityType}</option>
+                            ))}
+                        </select>
+                        <button disabled={!textSelectionState.valid || !selectedEntityType} onClick={addEntityHandler}>
+                            Add Entity
+                        </button>
+                    </p>
 
-                <div className='ActionPanel'>
-                    <span>
-                        From Entity:
-                        <select name='Relation Types' onChange={onFromEntityChangeHandler}>
+                    <p>
+                        From:
+                        <select onChange={onFromEntityChangeHandler} className='Select' style={{ width: '11vw' }}>
                             <option>Select Entity</option>
                             {entities.map(entity => (
                                 <option value={entity.id}>
@@ -417,19 +411,15 @@ function Labeling() {
                                 </option>
                             ))}
                         </select>
-                    </span>
-                    <span>
-                        Relation Type:
-                        <select name='Relation Types' onChange={onRelationTypeChangeHandler}>
-                            <option value={null}>Select Relation Type</option>
+                        Relation:
+                        <select onChange={onRelationTypeChangeHandler} style={{ width: '11vw' }}>
+                            <option value={null}>Select Relation</option>
                             {relationTypes.map(relationType => (
                                 <option value={relationType}> {relationType} </option>
                             ))}
                         </select>
-                    </span>
-                    <span>
-                        To Entity:
-                        <select name='Relation Types' onChange={onToEntityChangeHandler}>
+                        To:
+                        <select onChange={onToEntityChangeHandler} style={{ width: '11vw' }}>
                             <option>Select Entity</option>
                             {entities.map(entity => (
                                 <option value={entity.id}>
@@ -437,10 +427,10 @@ function Labeling() {
                                 </option>
                             ))}
                         </select>
-                    </span>
                     <button disabled={isInValidRelation()} onClick={addRelationHandler}>
                         Add Relation
                     </button>
+                    </p>
                 </div>
             </div>
             <div className='LabelsWrapper'>
