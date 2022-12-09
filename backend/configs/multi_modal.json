@@ -1,7 +1,7 @@
 {
-    "sorted_similarities_filepath": "",
-    "extracted_data_directory": "",
-    "processed_data_directory": "",
-    "detected_objects_directory": "",
-    "objects_info_filepath": ""
-}
+    "sorted_similarities_filepath": "/data/processed/sorted_similarities.json",
+    "extracted_data_directory": "/data/extracted",
+    "processed_data_directory": "/data/processed",
+    "detected_objects_directory": "/data/processed/objects",
+    "objects_info_filepath": "/data/processed/objects.json"
+} 

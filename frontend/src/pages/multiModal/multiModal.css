@@ -1,8 +1,25 @@
 .Original-Image {
-    height: 320px;
+    height: auto;
     width: auto;
 }
 
 .Object-Image {
     height: 100px;
+}
+
+.Similar-Image {
+    height: 200px;
+    width: 200px;
+}
+
+.Similar-Image-Zoom {
+    height: 200px;
+    width: 200px;
+}
+
+.Similar-Image-Zoom:hover {
+    position: absolute;
+    height: max-content;
+    width: max-content;
+    overflow: hidden;
 }

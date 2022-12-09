@@ -23,19 +23,19 @@ root.render(
         <BrowserRouter>
             <Navbar bg="dark" variant="dark">
                 <Container>
-                    <Navbar.Brand href="/">Learning-e2e</Navbar.Brand>
+                    <Navbar.Brand href="/">Meme Understanding - MAMI: Multimedia Automatic Misogyny Identification</Navbar.Brand>
                     <Nav className="me-auto">
-                        <Nav.Link href="admin">Admin</Nav.Link>
-                        <Nav.Link href="re">Relation Extraction</Nav.Link>
-                        <Nav.Link href="multi-modal">Multi Modal</Nav.Link>
+                        {/* <Nav.Link href="admin">Admin</Nav.Link> */}
+                        {/* <Nav.Link href="re">Relation Extraction</Nav.Link> */}
+                        {/* <Nav.Link href="multi-modal">Multi Modal</Nav.Link> */}
                     </Nav>
                 </Container>
             </Navbar>
             <Routes>
-                <Route path="/" element={<Home />}></Route>
-                <Route path="/re" element={<Labeling />}></Route>
-                <Route path="/admin" element={<Admin />}></Route>
-                <Route path='/multi-modal' element={<MultiModal />} ></Route>
+                <Route path="/" element={<MultiModal />}></Route>
+                {/* <Route path="/re" element={<Labeling />}></Route> */}
+                {/* <Route path="/admin" element={<Admin />}></Route> */}
+                {/* <Route path='/multi-modal' element={<MultiModal />} ></Route> */}
             </Routes>
         </BrowserRouter>
     </React.StrictMode>
