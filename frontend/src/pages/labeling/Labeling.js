@@ -14,7 +14,7 @@ function Labeling() {
     // Timer state
     const [timer, setTimer] = useState(0);
     const [isTimerActive, setIsTimerActive] = useState(false);
-    
+
     // Fetch next
     const [nextFetchFilter, setNextFetchFilter] = useState('all');
     const [nextOffset, setNextOffset] = useState(-1);
@@ -172,7 +172,7 @@ function Labeling() {
                             invalid: relation['invalid'],
                         };
                     });
-                    
+
                     setTimer(result['duration'] ? result['duration'] : 0);
                     setIsTimerActive(result['duration'] ? false : true);
                     setSampleID(result['_id']);
@@ -291,15 +291,15 @@ function Labeling() {
             return;
         }
 
-        addEntityHandler();
+        addEntityHandler(selectedEntityType);
     };
 
     // NER labelling UI
-    const addEntityHandler = () => {
+    const addEntityHandler = (entityType) => {
         let newEntity = {
             id: uuidv4(),
             text: textSelectionState.text,
-            type: selectedEntityType,
+            type: entityType,
             start: textSelectionState.start,
             end: textSelectionState.end,
         };
@@ -316,6 +316,7 @@ function Labeling() {
         new_entities.sort((a, b) => a.start - b.start);
         setEntities(new_entities);
     };
+
     let onRelationTypeChangeHandler = e => {
         setSelectedRelationType(e.target.value);
     };
@@ -377,9 +378,9 @@ function Labeling() {
                     <button onClick={() => getNextHandler(1)}>Get next</button>
                     <button onClick={() => changeStateHandler('approved')}>Approve</button>
                     <button onClick={() => changeStateHandler('flag')}>Flag</button>
-                    <Timer timer={timer} setTimerFunc={setTimer} isActive={isTimerActive} setIsActiveFunc={setIsTimerActive}/>
+                    <Timer timer={timer} setTimerFunc={setTimer} isActive={isTimerActive} setIsActiveFunc={setIsTimerActive} />
                     <text>{controlPanelMessage}</text>
-                </span> 
+                </span>
                 <textarea className='Sentence' value={textData.join(' ')} onSelect={textSelectionHandler} onContextMenu={textAreaContextMenuHandler} />
                 <div className='ActionPanel'>
                     <p> Entity Types:
@@ -389,6 +390,7 @@ function Labeling() {
                             id='entitytypes'
                             onChange={e => {
                                 setSelectedEntityType(e.target.value);
+                                textSelectionState.valid && addEntityHandler(e.target.value);
                             }}
                         >
                             <option value={null}>Select Entity Type</option>
@@ -396,7 +398,10 @@ function Labeling() {
                                 <option value={entityType}>{entityType}</option>
                             ))}
                         </select>
-                        <button disabled={!textSelectionState.valid || !selectedEntityType} onClick={addEntityHandler}>
+                        <button disabled={!textSelectionState.valid || !selectedEntityType} onClick={() => {
+                            addEntityHandler(selectedEntityType);
+                        }
+                        }>
                             Add Entity
                         </button>
                     </p>
@@ -427,9 +432,9 @@ function Labeling() {
                                 </option>
                             ))}
                         </select>
-                    <button disabled={isInValidRelation()} onClick={addRelationHandler}>
-                        Add Relation
-                    </button>
+                        <button disabled={isInValidRelation()} onClick={addRelationHandler}>
+                            Add Relation
+                        </button>
                     </p>
                 </div>
             </div>
