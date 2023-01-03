@@ -1,5 +1,5 @@
 # learning_e2e
-Web framework for end to end machine learning. Currently only NER data labeling is supported.
+Web framework for end to end machine learning. Currently only NER and RE data labeling is supported.
 
 * To run with last stable release: `git checkout v0.1.6`
 * Run the application in docker: `docker-compose -f docker-compose.dev.yml up -d`
