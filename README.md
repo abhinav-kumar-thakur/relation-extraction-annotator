@@ -24,7 +24,12 @@ Application will become available on [http://localhost:11001/](http://localhost:
 ## NER labeling tool
 
 ### NER labeling UI Demo
-![image](https://user-images.githubusercontent.com/14326083/179493581-ec518f10-5a5d-4174-9d92-43117e8fc5d6.png)
+#### Admin Page (Upload)
+![image](https://user-images.githubusercontent.com/14326083/221099363-182d6e8e-d419-4ae0-a828-7f27aec9b82d.png)
+#### Admin Page (Download)
+![image](https://user-images.githubusercontent.com/14326083/221099456-6b2f0136-628c-42ff-89ec-a18b0a9f2d16.png)
+#### Relation Extraction: Labeling Page
+![image](https://user-images.githubusercontent.com/14326083/221099603-4728e623-585d-4b91-bfa4-5182d1ac0e6a.png)
 
 Once the application is running, follow following steps to start NER labeling.
 1. One time / First time: Upload the types and data files manually. Upload of new types/data file completely removes previously stored values.
