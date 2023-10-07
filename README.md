@@ -1,4 +1,4 @@
-# learning_e2e
+# relation-extraction-annotator
 Web framework for end to end machine learning. Currently only NER and RE data labeling is supported.
 
 * To run with last stable release: `git checkout v0.1.6`
